@@ -20,4 +20,30 @@ class TWAERun {
 };
 
 
+TWAE::TWAE()
+{
+	TW_Static *s;
+	s = new TW_Static;
+	s->W = ParamsGetInt("twowheel","w",true);
+	state = (void *) s;
+}
 
+TWAE::~TWAE()
+{
+	TW_Static *s;
+
+	s = (TW_Static *) state;
+	delete s;
+}
+
+void *TWAE::NewRun()
+{
+	TWAERun *ap;
+	TW_Static *as;
+	int i;
+	unsigned int a;
+
+	as = (TW_Static *) state;
+	ap = new TWAERun;
+
+}
