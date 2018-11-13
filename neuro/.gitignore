@@ -1,0 +1,10 @@
+lib/*
+!lib/.keep
+bin/*
+!bin/.keep
+obj/*
+!obj/.keep
+a.out
+
+lineage*
+network*
