@@ -1,273 +1,266 @@
-1.  #!/usr/bin/env python   
+#!/usr/bin/env python   
+  # coding: latin-1   
 
-2.  # coding: latin-1   
+# I am Mohammad Omar, this module is builded to interface with the Driver MDD10A, to control two DC motors.   
+  # the original code designed by Ingmar Stapel ,www.raspberry-pi-car.com to control two motors with a L298N H-Bridge   
 
-3.  # I am Mohammad Omar, this module is builded to interface with the Driver MDD10A, to control two DC motors.   
+  # The pins configuration for Model B Revision 1.0    
 
-4.  # the original code designed by Ingmar Stapel ,www.raspberry-pi-car.com to control two motors with a L298N H-Bridge   
 
-5.  # The pins configuration for Model B Revision 1.0    
+  # How to Use this module: 1- creating an instance of the class. 2- call the Init function, 3- call commands functions   
 
-6.     
+  # Example:   
+  # import MDD10A   
 
-7.  # How to Use this module: 1- creating an instance of the class. 2- call the Init function, 3- call commands functions   
+ # Motors = MDD10A.MDD10A()   
 
-8.  # Example:   
 
-9.  # import MDD10A   
 
-10. # Motors = MDD10A.MDD10A()   
+ # Import the libraries the class needs   
 
-11.    
+from RPi.GPIO  import io;
 
-12. # Import the libraries the class needs   
+io.setmode(io.BCM)  
 
-13. import RPi.GPIO as io   
 
-14. io.setmode(io.BCM)  
 
-15.   
+ # Constant values,   
 
-16. # Constant values,   
+        PWM_MAX                 = 100  
 
-17. PWM_MAX                 = 100  
 
-18.   
 
-19. # Disable warning from GPIO  
+ # Disable warning from GPIO  
 
-20. io.setwarnings(False)  
+ io.setwarnings(False)  
 
-21.   
 
-22. # Here we configure the GPIO settings for the left and right motors spinning direction.  
 
-23. # as described in the user manual of MDD10A https://www.robotshop.com/media/files/pdf/user-manual-mdd10a.pdf  
+ # Here we configure the GPIO settings for the left and right motors spinning direction.  
 
-24. # there are four input PWM1-DIR1-PWM2-DIR2  
+# as described in the user manual of MDD10A https://www.robotshop.com/media/files/pdf/user-manual-mdd10a.pdf  
 
-25. # WITH MAX Frequency 20 Hz, and it works as follow,  
+# there are four input PWM1-DIR1-PWM2-DIR2  
 
-26. #       Input   DIR     Output-A    Output-B  
+# WITH MAX Frequency 20 Hz, and it works as follow,  
+#       Input   DIR     Output-A    Output-B  
 
-27. #   PWM  off    X         off         off  
+#   PWM  off    X         off         off  
 
-28. #   PWM  on     off       on          off  
+#   PWM  on     off       on          off  
 
-29. #   PWM  on     on        off         on  
+#   PWM  on     on        off         on  
 
-30.   
 
-31. # The pins configuration for Model B Revision 1.0   
+ # The pins configuration for Model B Revision 1.0   
 
-32. leftMotor_DIR_pin = 22  
+leftMotor_DIR_pin = 22  
 
-33. io.setup(leftMotor_DIR_pin, io.OUT)  
+ io.setup(leftMotor_DIR_pin, io.OUT)  
 
-34.   
 
-35. rightMotor_DIR_pin = 23  
 
-36. io.setup(rightMotor_DIR_pin, io.OUT)  
+ rightMotor_DIR_pin = 23  
 
-37.   
+ io.setup(rightMotor_DIR_pin, io.OUT)  
 
-38. io.output(leftMotor_DIR_pin, False)  
 
-39.   
 
-40. io.output(rightMotor_DIR_pin, False)  
+ io.output(leftMotor_DIR_pin, False)  
 
-41.   
 
-42.   
 
-43. # Here we configure the GPIO settings for the left and right motors spinning speed.   
+ io.output(rightMotor_DIR_pin, False)  
 
-44.   
 
-45. leftMotor_PWM_pin = 17  
 
-46. rightMotor_PWM_pin = 18  
 
-47.   
 
-48. io.setup(leftMotor_PWM_pin, io.OUT)  
+ # Here we configure the GPIO settings for the left and right motors spinning speed.   
 
-49. io.setup(rightMotor_PWM_pin, io.OUT)  
 
-50.   
 
-51. # MAX Frequency 20 Hz  
+ leftMotor_PWM_pin = 17  
 
-52. leftMotorPWM = io.PWM(leftMotor_PWM_pin,20)  
+ rightMotor_PWM_pin = 18  
 
-53. rightMotorPWM = io.PWM(rightMotor_PWM_pin,20)  
 
-54.   
 
-55. leftMotorPWM.start(0)  
+ io.setup(leftMotor_PWM_pin, io.OUT)  
 
-56. leftMotorPWM.ChangeDutyCycle(0)  
+ io.setup(rightMotor_PWM_pin, io.OUT)  
 
-57.   
 
-58. rightMotorPWM.start(0)  
 
-59. rightMotorPWM.ChangeDutyCycle(0)  
+ # MAX Frequency 20 Hz  
 
-60.   
+ leftMotorPWM = io.PWM(leftMotor_PWM_pin,20)  
 
-61. leftMotorPower = 0  
+ rightMotorPWM = io.PWM(rightMotor_PWM_pin,20)  
 
-62. rightMotorPower = 0  
 
-63.   
 
-64. def getMotorPowers():  
+ leftMotorPWM.start(0)  
 
-65.       
+ leftMotorPWM.ChangeDutyCycle(0)  
 
-66.     return (leftMotorPower,rightMotorPower)       
 
-67.   
 
-68. def setMotorLeft(power):  
+ rightMotorPWM.start(0)  
 
-69.   
+ rightMotorPWM.ChangeDutyCycle(0)  
 
-70. # SetMotorLeft(power)  
 
-71.   
 
-72. # Sets the drive level for the left motor, from +1 (max) to -1 (min).  
+ leftMotorPower = 0  
 
-73.   
+ rightMotorPower = 0  
 
-74. # This is a short explanation for a better understanding:  
 
-75. # SetMotorLeft(0)     -> left motor is stopped  
 
-76. # SetMotorLeft(0.75)  -> left motor moving forward at 75% power  
+ def getMotorPowers():  
 
-77. # SetMotorLeft(-0.5)  -> left motor moving reverse at 50% power  
 
-78. # SetMotorLeft(1)     -> left motor moving forward at 100% power  
 
-79.   
+     return (leftMotorPower,rightMotorPower)       
 
-80.     if power < 0:  
 
-81.         # Reverse mode for the left motor  
 
-82.         io.output(leftMotor_DIR_pin, False)  
+ def setMotorLeft(power):  
 
-83.         pwm = -int(PWM_MAX * power)  
 
-84.         if pwm > PWM_MAX:  
 
-85.             pwm = PWM_MAX  
+     # SetMotorLeft(power)  
 
-86.     elif power > 0:  
 
-87.         # Forward mode for the left motor  
 
-88.         io.output(leftMotor_DIR_pin, True)  
+ # Sets the drive level for the left motor, from +1 (max) to -1 (min).  
 
-89.         pwm = int(PWM_MAX * power)  
 
-90.         if pwm > PWM_MAX:  
 
-91.             pwm = PWM_MAX  
+ # This is a short explanation for a better understanding:  
 
-92.     else:  
+ # SetMotorLeft(0)     -> left motor is stopped  
 
-93.         # Stopp mode for the left motor  
+ # SetMotorLeft(0.75)  -> left motor moving forward at 75% power  
 
-94.         io.output(leftMotor_DIR_pin, False)  
+ # SetMotorLeft(-0.5)  -> left motor moving reverse at 50% power  
 
-95.         pwm = 0  
+# SetMotorLeft(1)     -> left motor moving forward at 100% power  
 
-96. #   print "SetMotorLeft", pwm  
 
-97.     leftMotorPower = pwm  
 
-98.     leftMotorPWM.ChangeDutyCycle(pwm)  
+     if power < 0:  
 
-99.   
+         # Reverse mode for the left motor  
 
-100.          def setMotorRight(power):  
+         io.output(leftMotor_DIR_pin, False)  
 
-101.            
+         pwm = -int(PWM_MAX * power)  
 
-102.          # SetMotorRight(power)  
+         if pwm > PWM_MAX:  
 
-103.            
+             pwm = PWM_MAX  
 
-104.          # Sets the drive level for the right motor, from +1 (max) to -1 (min).  
+     elif power > 0:  
 
-105.            
+         # Forward mode for the left motor  
 
-106.          # This is a short explanation for a better understanding:  
+         io.output(leftMotor_DIR_pin, True)  
 
-107.          # SetMotorRight(0)     -> right motor is stopped  
+         pwm = int(PWM_MAX * power)  
 
-108.          # SetMotorRight(0.75)  -> right motor moving forward at 75% power  
+         if pwm > PWM_MAX:  
 
-109.          # SetMotorRight(-0.5)  -> right motor moving reverse at 50% power  
+             pwm = PWM_MAX  
 
-110.          # SetMotorRight(1)     -> right motor moving forward at 100% power  
+     else:  
 
-111.            
+         # Stopp mode for the left motor  
 
-112.              if power < 0:  
+         io.output(leftMotor_DIR_pin, False)  
 
-113.                  # Reverse mode for the right motor  
+         pwm = 0  
 
-114.                  io.output(rightMotor_DIR_pin, True)  
+ #   print "SetMotorLeft", pwm  
 
-115.                  pwm = -int(PWM_MAX * power)  
+     leftMotorPower = pwm  
 
-116.                  if pwm > PWM_MAX:  
+     leftMotorPWM.ChangeDutyCycle(pwm)  
 
-117.                      pwm = PWM_MAX  
 
-118.              elif power > 0:  
 
-119.                  # Forward mode for the right motor  
+          def setMotorRight(power):  
 
-120.                  io.output(rightMotor_DIR_pin, False)  
 
-121.                  pwm = int(PWM_MAX * power)  
 
-122.                  if pwm > PWM_MAX:  
+              # SetMotorRight(power)  
 
-123.                      pwm = PWM_MAX  
 
-124.              else:  
 
-125.                  # Stopp mode for the right motor  
+          # Sets the drive level for the right motor, from +1 (max) to -1 (min).  
 
-126.                  io.output(rightMotor_DIR_pin, False)  
 
-127.                  pwm = 0  
 
-128.          #   print "SetMotorRight", pwm  
+          # This is a short explanation for a better understanding:  
 
-129.              rightMotorPower = pwm  
+          # SetMotorRight(0)     -> right motor is stopped  
 
-130.              rightMotorPWM.ChangeDutyCycle(pwm)  
+          # SetMotorRight(0.75)  -> right motor moving forward at 75% power  
 
-131.            
+          # SetMotorRight(-0.5)  -> right motor moving reverse at 50% power  
 
-132.          def exit():  
+          # SetMotorRight(1)     -> right motor moving forward at 100% power  
 
-133.          # Program will clean up all GPIO settings and terminates  
 
-134.              io.output(leftMotor_DIR_pin, False)  
 
-135.              io.output(rightMotor_DIR_pin, False)  
+              if power < 0:  
 
-136.              io.cleanup()  
+                  # Reverse mode for the right motor  
+
+                  io.output(rightMotor_DIR_pin, True)  
+                  pwm = -int(PWM_MAX * power)  
+
+                  if pwm > PWM_MAX:  
+
+                      pwm = PWM_MAX  
+
+              elif power > 0:  
+
+                  # Forward mode for the right motor  
+
+                  io.output(rightMotor_DIR_pin, False)  
+
+                  pwm = int(PWM_MAX * power)  
+
+                 if pwm > PWM_MAX:  
+
+                     pwm = PWM_MAX  
+
+              else:  
+
+                  # Stopp mode for the right motor  
+
+                  io.output(rightMotor_DIR_pin, False)  
+
+                  pwm = 0  
+
+          #   print "SetMotorRight", pwm  
+
+              rightMotorPower = pwm  
+
+              rightMotorPWM.ChangeDutyCycle(pwm)  
+
+
+
+          def exit():  
+
+              # Program will clean up all GPIO settings and terminates  
+
+              io.output(leftMotor_DIR_pin, False)  
+
+              io.output(rightMotor_DIR_pin, False)  
+
+             io.cleanup()  
 
 Test MDD10A
