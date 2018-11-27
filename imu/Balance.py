@@ -54,6 +54,7 @@ while True:
 	    gyro_x = read_raw_data(GYRO_XOUT_H)
             Gx = gyro_x/131.0
             pwm.start(20)
+        pwm.stop()
 
 
 
