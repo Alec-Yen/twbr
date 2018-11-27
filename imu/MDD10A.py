@@ -103,11 +103,11 @@ rightMotorPWM.ChangeDutyCycle(0)
 
 
 
-leftMotorPower = 10  
+leftMotorPower = 0  
 
-rightMotorPower = 10
+rightMotorPower = 0
 
-setMotorLeft(10)
+##setMotorLeft(10)
 
 
 
@@ -251,3 +251,4 @@ def exit():
 
     io.cleanup()  
 
+setMotorLeft(50)
