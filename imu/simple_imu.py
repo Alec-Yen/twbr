@@ -44,12 +44,12 @@ def read_raw_data(addr):
                 value = value - 65536
         return value
 
-"""
 bus = smbus.SMBus(1) 	# or bus = smbus.SMBus(0) for older version boards
 Device_Address = 0x68   # MPU6050 device address
 
 MPU_Init()
 
+"""
 print (" Reading Data of Gyroscope and Accelerometer")
 
 while True:
