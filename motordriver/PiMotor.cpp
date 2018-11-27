@@ -14,8 +14,8 @@ PiMotor::PiMotor(int forwardPin, int reversePin) {
         printf("Creating motor object with pins %i and %i\n\r", forwardPin, reversePin);
     }
     
-    fPin = forwardPin;
-    rPin = reversePin;
+    pwmPin = forwardPin;
+    dirPin = reversePin;
 }
 
 void PiMotor::setDebug(bool debug) {
@@ -33,13 +33,13 @@ void PiMotor::stop() {
         }
       return;
    }
-    gpioSetMode(fPin, PI_OUTPUT);
-    gpioSetMode(rPin, PI_OUTPUT);
-    gpioPWM(fPin, 0);
-    gpioPWM(rPin, 0);
+    gpioSetMode(pwmPin, PI_OUTPUT);
+    gpioSetMode(dirPin, PI_OUTPUT);
+    gpioPWM(pwmPin, 0);
+    gpioPWM(dirPin, 0);
     
     if (DEBUG) {
-        printf("Stopping motors on pin %i and pin %i.\n\r", rPin, fPin);
+        printf("Stopping motors on pin %i and pin %i.\n\r", dirPin, pwmPin);
     }
    
    //Free resources & GPIO access
@@ -64,7 +64,7 @@ void PiMotor::runForMS(int direction, int speed, int milliseconds) {
     }
 }
 
-void PiMotor::run (int direction, int speed) {
+void PiMotor::run (int speed) {
     //Initialise GPIO.
     if (gpioInitialise() < 0) {
         if (DEBUG) {
@@ -73,16 +73,6 @@ void PiMotor::run (int direction, int speed) {
       return;
    }
   
-  if (direction == 0) {
-      direction = rPin;
-  } else if (direction == 1) {
-      direction = fPin;
-  } else {
-      if (DEBUG) {
-        fprintf(stderr, "Invalid Direction Value in PiMotor::run\n\r");
-      }
-      return;
-  }
   
    //Set motor as output.
     gpioSetMode(direction, PI_OUTPUT);
