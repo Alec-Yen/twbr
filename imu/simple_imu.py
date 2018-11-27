@@ -44,7 +44,7 @@ def read_raw_data(addr):
                 value = value - 65536
         return value
 
-
+"""
 bus = smbus.SMBus(1) 	# or bus = smbus.SMBus(0) for older version boards
 Device_Address = 0x68   # MPU6050 device address
 
@@ -76,3 +76,4 @@ while True:
 
 	print ("Gx=%.2f" %Gx, u'\u00b0'+ "/s", "\tGy=%.2f" %Gy, u'\u00b0'+ "/s", "\tGz=%.2f" %Gz, u'\u00b0'+ "/s", "\tAx=%.2f g" %Ax, "\tAy=%.2f g" %Ay, "\tAz=%.2f g" %Az) 	
 	sleep(1)
+        """
