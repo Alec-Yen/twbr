@@ -4,6 +4,7 @@ import  RPi.GPIO as GPIO
 import time
 import smbus
 
+##Memory address for the IMU
 PWR_MGMT_1   = 0x6B
 SMPLRT_DIV   = 0x19
 CONFIG       = 0x1A
@@ -18,10 +19,12 @@ GYRO_ZOUT_H  = 0x47
 
 
 
-
+##This is the GPIO pin set up. I define that I want to output at the pins of 12 and 32 and that i want the output to be a PWM signal
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12,GPIO.OUT)
-pwm=GPIO.PWM(12,100)
+GPIO.setup(32,GPIO.OUT)
+pwm1=GPIO.PWM(12,100)
+pwm2=GPIO.PWM(32,100)
 
 
 bus = smbus.SMBus(1)
@@ -50,9 +53,12 @@ while True:
 	Gy = gyro_y/131.0
 	Gz = gyro_z/131.0
 
-        while(Gx < 0):
-	    gyro_x = read_raw_data(GYRO_XOUT_H)
-            Gx = gyro_x/131.0
-            pwm.start(20)
-
-        pwm.stop()
+        ## If the IMU is oriented in the negative x direction the motors will move forward, if in the negative direction, the motors will move in reverse
+        if(Ax < 0):
+	    acc_x = read_raw_data(ACCEL_XOUT_H)
+            Ax = gyro_x/16384.0
+            pwm1.start(10)
+            pwm2.start(10)
+        elif(Ax >= 0):
+            pwm1.stop()
+            pwm2.stop()
