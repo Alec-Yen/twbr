@@ -11,7 +11,7 @@
 
 import RPi.GPIO as io
 
-io.setmode(io.BCM)  
+#io.setmode(io.BCM)  
 
 
 
@@ -45,23 +45,23 @@ io.setwarnings(False)
 
 # The pins configuration for Model B Revision 1.0   
 
-leftMotor_DIR_pin = 16  
+#leftMotor_DIR_pin = 16  
 
-io.setup(leftMotor_DIR_pin, io.OUT)  
-
-
-
-rightMotor_DIR_pin = 32  
-
-io.setup(rightMotor_DIR_pin, io.OUT)  
+#io.setup(leftMotor_DIR_pin, io.OUT)  
 
 
 
-io.output(leftMotor_DIR_pin, False)  
+#rightMotor_DIR_pin = 32  
+
+#io.setup(rightMotor_DIR_pin, io.OUT)  
 
 
 
-io.output(rightMotor_DIR_pin, False)  
+#io.output(leftMotor_DIR_pin, False)  
+
+
+
+#io.output(rightMotor_DIR_pin, False)  
 
 
 
@@ -71,43 +71,43 @@ io.output(rightMotor_DIR_pin, False)
 
 
 
-leftMotor_PWM_pin = 12  
+#leftMotor_PWM_pin = 12  
 
-rightMotor_PWM_pin = 32  
+#rightMotor_PWM_pin = 32  
 
 
 
-io.setup(leftMotor_PWM_pin, io.OUT)  
+#io.setup(leftMotor_PWM_pin, io.OUT)  
 
-io.setup(rightMotor_PWM_pin, io.OUT)  
+#io.setup(rightMotor_PWM_pin, io.OUT)  
 
 
 
 # MAX Frequency 20 Hz  
 
-leftMotorPWM = io.PWM(leftMotor_PWM_pin,20)  
+#leftMotorPWM = io.PWM(leftMotor_PWM_pin,20)  
 
-rightMotorPWM = io.PWM(rightMotor_PWM_pin,20)  
-
-
-
-leftMotorPWM.start(0)  
-
-leftMotorPWM.ChangeDutyCycle(0)  
+#rightMotorPWM = io.PWM(rightMotor_PWM_pin,20)  
 
 
 
-rightMotorPWM.start(0)  
+#leftMotorPWM.start(0)  
 
-rightMotorPWM.ChangeDutyCycle(0)  
+#leftMotorPWM.ChangeDutyCycle(0)  
 
 
 
-leftMotorPower = 10  
+#rightMotorPWM.start(0)  
 
-rightMotorPower = 10
+#rightMotorPWM.ChangeDutyCycle(0)  
 
-setMotorLeft(10)
+
+
+#leftMotorPower = 10  
+
+#rightMotorPower = 10
+
+#setMotorLeft(10)
 
 
 
@@ -142,39 +142,39 @@ def setMotorLeft(power):
     if power < 0:  
 
          # Reverse mode for the left motor  
-        io.output(leftMotor_DIR_pin, False)  
+        io.output(Dir1, False)  
 
-        pwm = -int(PWM_MAX * power)  
+        pwm1 = -int(PWM_MAX * power)  
 
-        if pwm > PWM_MAX:  
+        if pwm1 > PWM_MAX:  
 
-            pwm = PWM_MAX  
+            pwm1 = PWM_MAX  
 
     elif power > 0:  
 
          # Forward mode for the left motor  
 
-        io.output(leftMotor_DIR_pin, True)  
+        io.output((Dir1, True)  
 
-        pwm = int(PWM_MAX * power)  
+        pwm1 = int(PWM_MAX * power)  
 
-        if pwm > PWM_MAX:  
+        if pwm1 > PWM_MAX:  
 
-            pwm = PWM_MAX  
+            pwm1 = PWM_MAX  
 
     else:  
 
          # Stopp mode for the left motor  
 
-        io.output(leftMotor_DIR_pin, False)  
+        io.output(Dir1, False)  
 
-        pwm = 0  
+        pwm1 = 0  
 
  #   print "SetMotorLeft", pwm  
 
-    leftMotorPower = pwm  
+    leftMotorPower = pwm1  
 
-    leftMotorPWM.ChangeDutyCycle(pwm)  
+    leftMotorPWM.ChangeDutyCycle(pwm1)  
 
 
 
