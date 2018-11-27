@@ -1,5 +1,6 @@
 from simple_imu import read_raw_data, MPU_Init
 from time import sleep
+from MDD10A import setMotorLeft
 import  RPi.GPIO as GPIO
 import time
 import smbus
@@ -16,13 +17,19 @@ ACCEL_ZOUT_H = 0x3F
 GYRO_XOUT_H  = 0x43
 GYRO_YOUT_H  = 0x45
 GYRO_ZOUT_H  = 0x47
-
+##Defining values for Motors
+Dir1 = 16 
+Dir2 = 36
 
 
 ##This is the GPIO pin set up. I define that I want to output at the pins of 12 and 32 and that i want the output to be a PWM signal
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12,GPIO.OUT)
 GPIO.setup(32,GPIO.OUT)
+GPIO.setup(Dir1,GPIO.OUT)
+GPIO.setup(Dir2,GPIO.OUT)
+GPIO.output(Dir1, False)
+GPIO.output(Dir2, False)
 pwm1=GPIO.PWM(12,100)
 pwm2=GPIO.PWM(32,100)
 
@@ -32,6 +39,8 @@ Device_Address = 0x68
 
 MPU_Init()
 
+setMotorLeft(50)
+"""
 while True:
 	
 	#Read Accelerometer raw value
@@ -62,3 +71,5 @@ while True:
         elif(Ax >= 0):
             pwm1.stop()
             pwm2.stop()
+
+            """
