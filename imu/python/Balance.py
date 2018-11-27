@@ -1,6 +1,6 @@
 from simple_imu import read_raw_data, MPU_Init
 from time import sleep
-from MDD10A import setMotorLeft
+#from MDD10A import setMotorLeft
 import  RPi.GPIO as GPIO
 import time
 import smbus
@@ -39,8 +39,8 @@ Device_Address = 0x68
 
 MPU_Init()
 
-setMotorLeft(50)
-"""
+##setMotorLeft(50)
+
 while True:
 	
 	#Read Accelerometer raw value
@@ -64,12 +64,16 @@ while True:
 
         ## If the IMU is oriented in the negative x direction the motors will move forward, if in the negative direction, the motors will move in reverse
         if(Ax < 0):
-	    acc_x = read_raw_data(ACCEL_XOUT_H)
-            Ax = gyro_x/16384.0
-            pwm1.start(10)
-            pwm2.start(10)
+	    #acc_x = read_raw_data(ACCEL_XOUT_H)
+            #Ax = gyro_x/16384.0
+            pwm1.start(40)
+            GPIO.output(Dir1, True)
+            pwm2.start(40)
+            GPIO.output(Dir2, False)
         elif(Ax >= 0):
-            pwm1.stop()
-            pwm2.stop()
+            pwm1.start(10)
+            GPIO.output(Dir1, False)
+            pwm2.start(10)
+            GPIO.output(Dir2, True)
 
-            """
+
