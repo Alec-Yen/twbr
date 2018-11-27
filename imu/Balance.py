@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from simple_imu import read_raw_data, MPU_Init
 from time import sleep
 import  RPi.GPIO as GPIO
@@ -62,6 +63,8 @@ while True:
 
 
 
+=======
+>>>>>>> parent of 7d8d2e6... small edits
 =======
 >>>>>>> parent of 7d8d2e6... small edits
 =======
