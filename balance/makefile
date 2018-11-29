@@ -8,5 +8,7 @@ clean:
 
 main: main.cpp
 	g++ -c PiMotor.cpp 
-	g++ -c main.cpp 
-	g++ -o $(BIN)main main.o PiMotor.o -lpigpio -lrt -lpthread
+	g++ -c main.cpp -I  ../imu/cpp/Arduino_MPU6050 ../imu/cpp/Arduino_MPU6050/MPU6050.cpp \
+	      	-I ../imu/cpp/RaspberryPi_bcm2835/I2Cdev ../imu/cpp/RaspberryPi_bcm2835/I2Cdev/I2Cdev.cpp \
+	       	-lpigpio -lrt -lpthread -l bcm2835 -l m
+	g++ -o $(BIN)main main.o PiMotor.o
