@@ -43,7 +43,8 @@ void PID (double& motorPower, int& direction)
 	gyroRate = gyroX * 250/32768;
 
 	gyroAngle = (double)gyroRate*sampleTime;  
-	currentAngle = 0.9934*(prevAngle + gyroAngle) + 0.0066*(accAngle);
+	currentAngle = 0.9934*(prevAngle + gyroAngle) + 0.0066*(accAngle); // complementary filter
+	//currentAngle = 0.0066*(prevAngle + gyroAngle) + 0.9934*(accAngle); // complementary filter
 
 	err = currentAngle - targetAngle;
 	error_sum = error_sum + err;
@@ -88,9 +89,9 @@ int main(int argc, char** argv) {
 
 	while (1) {
 	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
-		accY = mpu.getAccelerationY();
-		accZ = mpu.getAccelerationZ();
-		gyroX = mpu.getRotationX();
+		accY = mpu.getAccelerationY()/16384.0;
+		accZ = mpu.getAccelerationZ()/16384.0;
+		gyroX = mpu.getRotationX()/131.0;
 		printf("accY = %.2f accZ = %.2f gyroX = %.2f\n",accY,accZ,gyroX);
 		PID(motorPower,direction);
 		robot.moveSame(direction,motorPower,100);
