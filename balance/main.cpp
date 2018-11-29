@@ -3,6 +3,7 @@
 #include <cmath>
 #include "PiMotor.h"
 #include "MPU6050.h"
+#include "I2Cdev.h"
 
 using namespace std;
 
@@ -66,25 +67,34 @@ void PID (double& motorPower, int& direction)
 	if (motorPower > 200) motorPower = 200;
 	else if (motorPower < -200 ) motorPower = -200;
 
-	if (motorPower < 0) direction = 0;
+	if (motorPower < 0) {
+		direction = 0;
+		motorPower *= -1;
+	}
 	else direction = 1;
+
 }
 
 int main(int argc, char** argv) {
 
 	TWBR robot(p1,d1,p2,d2);
+	I2Cdev::initialize();
 	MPU6050 mpu;
+	mpu.initialize();
 
 	double motorPower;
 	int direction;
+	int16_t ax, ay, az, gx, gy, gz;
 
 	while (1) {
+	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
 		accY = mpu.getAccelerationY();
 		accZ = mpu.getAccelerationZ();
 		gyroX = mpu.getRotationX();
+		printf("accY = %.2f accZ = %.2f gyroX = %.2f\n",accY,accZ,gyroX);
 		PID(motorPower,direction);
 		robot.moveSame(direction,motorPower,100);
-		robot.wait(10);
+		//robot.wait(10);
 	}
 
 
