@@ -4,17 +4,19 @@
 
 using namespace std;
 
-int m1_A = 12; //Motor 1 Forward
-int m1_B = 16; //Motor 1 Reverse
+int p1 = 18; //Motor 0 PWM (refers to BCM numbers "GPIO 18", not the physical pins)
+int d1 = 23; //Motor 0 DIR
+int p2 = 12;
+int d2 = 16;
 
 int main(int argc, char** argv) {
     //Create a new instance for our Motor.
-    PiMotor motor1(m1_A, m1_B);
+
+		TWBR robot(p1,d1,p2,d2);
+		robot.moveSame (0,20,1000);
+		robot.wait(100);
+		robot.moveSame (1,20,1000);
     
-    motor1.setDebug(true); //Turn on Debug message output (see console window!)
-    motor1.run(0, 50); //Set PWM value for direction (0 = reverse, 1 = forwards)
-    motor1.stop(); //Stop the motor  
-    motor1.runForMS(0, 50, 4000); //Run for 4 seconds.
    
     return 0;
 }

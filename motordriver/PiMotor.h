@@ -1,24 +1,31 @@
-/* 
- * File:   PiMotor.h
- * Author: Steve McMillan
- *
- * Created on 07 July 2017, 17:13
- */
-
 #ifndef PIMOTOR_H
 #define PIMOTOR_H
 
 class PiMotor {
-private:
-    int fPin;
-    int rPin;
-    bool DEBUG = false;
-  public:
-      PiMotor(int, int);
-      void run (int,int);
-      void runForMS(int direction, int speed, int milliseconds);
-      void stop();
-      void setDebug(bool); 
+	protected:
+		int motorID; // either 0 (for the left) or 1 (for the right)
+		int pwmPin;
+		int dirPin;
+		bool DEBUG = false;
+	public:
+		PiMotor();
+		PiMotor(int,int,int);
+		void run (int,int);
+		void runForMS(int,int,double ms);
+		void stop();
+		void setDebug(bool); 
 };
+
+class TWBR {
+	protected:
+		PiMotor lMotor;
+		PiMotor rMotor;
+	public:
+		TWBR(int,int,int,int);
+		void moveSame(int FB, int speed, double ms);
+		void wait(double ms);
+};
+
+
 
 #endif /* PIMOTOR_H */
