@@ -40,14 +40,17 @@ void PID (double& motorPower, int& direction)
 	// calculate the angle of inclination
 	accAngle = atan2(accY, accZ) * RAD_TO_DEG;
 	//gyroRate = map(gyroX, -32768, 32767, -250, 250);
-	gyroRate = gyroX * 250/32768;
+	gyroRate = gyroX * 250/32768 * RAD_TO_DEG;
 
-	gyroAngle = (double)gyroRate*sampleTime;  
+
+	gyroAngle = gyroRate*sampleTime;  
 	currentAngle = 0.9934*(prevAngle + gyroAngle) + 0.0066*(accAngle); // complementary filter
 	//currentAngle = 0.0066*(prevAngle + gyroAngle) + 0.9934*(accAngle); // complementary filter
 
 	err = currentAngle - targetAngle;
 	error_sum = error_sum + err;
+
+	printf("accAngle %.2f\t gyroAngle %.6f\t\t gyroRate %.2f\t currentAngle %.2f\n",accAngle,gyroAngle,gyroRate,currentAngle);
 
 	//constrain
 	if (error_sum > 300) error_sum = 300;
@@ -65,8 +68,11 @@ void PID (double& motorPower, int& direction)
 	}
 */
 	// constrain (we determined max reasonable to be 200)
-	if (motorPower > 200) motorPower = 200;
-	else if (motorPower < -200 ) motorPower = -200;
+	motorPower = 0; //DELETE LATER
+	return;
+
+	if (motorPower > 100) motorPower = 100;
+	else if (motorPower < -100 ) motorPower = -100;
 
 	if (motorPower < 0) {
 		direction = 0;
@@ -92,10 +98,10 @@ int main(int argc, char** argv) {
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
-		printf("accY = %.2f accZ = %.2f gyroX = %.2f\n",accY,accZ,gyroX);
+//		printf("accY = %.2f accZ = %.2f gyroX = %.2f\n",accY,accZ,gyroX);
 		PID(motorPower,direction);
 		robot.moveSame(direction,motorPower,100);
-		//robot.wait(10);
+		robot.wait(sampleTime*1000);
 	}
 
 
