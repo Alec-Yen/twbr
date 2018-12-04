@@ -17,12 +17,13 @@ int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
-double sampleTime = 0.005; // seconds
+double sampleTime = 0.001; // seconds
 double targetAngle = 0;
 double Kp; // 1
 double Kd; // 3
 double Ki; // 1
 double RAD_TO_DEG = 180.0/3.14;
+int MAX_MOTOR = 80;
 
 // FIX: don't make these global (copying Arduino code right now)
 double accY, accZ, gyroX;
@@ -36,21 +37,17 @@ int distanceCm;
 void PID (double& motorPower, int& direction)
 {
 
-	double gyroRate;
+	double gyroRate, Pterm,iTerm,dTerm;
 
 	// calculate the angle of inclination
-	accAngle = atan2(accY, accZ) * RAD_TO_DEG;
+	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG;
 	//gyroRate = map(gyroX, -32768, 32767, -250, 250);
-	gyroRate = gyroX * 250/32768; // might need to be in degrees
-
+//	gyroRate = gyroX * 250/32768; // might need to be in degrees
+	gyroRate = gyroX/131.0;
 
 	gyroAngle = gyroRate*sampleTime;  
 	currentAngle = 0.9934*(prevAngle + gyroAngle) + 0.0066*(accAngle); // complementary filter
-	//currentAngle = 0.0066*(prevAngle + gyroAngle) + 0.9934*(accAngle); // complementary filter
 	
-	//FIX: remove later
-//	currentAngle = accAngle;
-
 	err = currentAngle - targetAngle;
 	error_sum = error_sum + err;
 
@@ -61,7 +58,11 @@ void PID (double& motorPower, int& direction)
 	else if (error_sum < -300) error_sum = -300;
 
 	//calculate output from P, I and D values
-	motorPower = Kp*(err) + Ki*(error_sum)*sampleTime - Kd*(currentAngle-prevAngle)/sampleTime;
+	Pterm = Kp*(currentAngle-targetAngle);
+	iTerm += Ki*currentAngle;
+	dTerm = Kd * (currentAngle-prevAngle);
+	motorPower = Pterm + iTerm + dTerm;
+	motorPower = Kp*(err) + Ki*(error_sum)*sampleTime - Kd*(currentAngle-prevAngle)/sampleTime; // comment out?
 	prevAngle = currentAngle;
 
 /*	// toggle the led on pin13 every second
@@ -76,8 +77,8 @@ void PID (double& motorPower, int& direction)
 //	motorPower = 0; //DELETE LATER
 //	return;
 
-	if (motorPower > 50) motorPower = 50;
-	else if (motorPower < -50 ) motorPower = -50;
+	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
+	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
 	printf("motorPower %.2f\n",motorPower);
 
