@@ -17,7 +17,7 @@ int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
 double sampleTime = 0.005; // seconds
-double targetAngle = -5;
+double targetAngle = 0;
 double Kp = 40;
 double Kd = 0.05;
 double Ki = 40;
@@ -46,6 +46,9 @@ void PID (double& motorPower, int& direction)
 	gyroAngle = gyroRate*sampleTime;  
 	currentAngle = 0.9934*(prevAngle + gyroAngle) + 0.0066*(accAngle); // complementary filter
 	//currentAngle = 0.0066*(prevAngle + gyroAngle) + 0.9934*(accAngle); // complementary filter
+	
+	//FIX: remove later
+//	currentAngle = accAngle;
 
 	err = currentAngle - targetAngle;
 	error_sum = error_sum + err;
