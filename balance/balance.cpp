@@ -17,7 +17,7 @@ int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
 double sampleTime = 0.005; // seconds
-double targetAngle = 0;
+double targetAngle = -5;
 double Kp = 40;
 double Kd = 0.05;
 double Ki = 40;
@@ -50,7 +50,7 @@ void PID (double& motorPower, int& direction)
 	err = currentAngle - targetAngle;
 	error_sum = error_sum + err;
 
-	printf("accAngle %.2f\t gyroAngle %.6f\t\t gyroRate %.2f\t currentAngle %.2f\n",accAngle,gyroAngle,gyroRate,currentAngle);
+	printf("accAngle %.2f\t gyroAngle %.6f\t\t gyroRate %.2f\t currentAngle %.2f\t",accAngle,gyroAngle,gyroRate,currentAngle);
 
 	//constrain
 	if (error_sum > 300) error_sum = 300;
@@ -68,11 +68,14 @@ void PID (double& motorPower, int& direction)
 	}
 */
 	// constrain (we determined max reasonable to be 200)
+
+	printf("motorPower %.2f\n",motorPower);
 	motorPower = 0; //DELETE LATER
 	return;
 
 	if (motorPower > 100) motorPower = 100;
 	else if (motorPower < -100 ) motorPower = -100;
+
 
 	if (motorPower < 0) {
 		direction = 0;
