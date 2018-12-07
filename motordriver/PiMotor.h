@@ -24,6 +24,7 @@ class TWBR {
 		TWBR(int,int,int,int);
 		void moveSame(int FB, int speed, double ms);
 		void wait(double ms);
+		void stop();
 };
 
 

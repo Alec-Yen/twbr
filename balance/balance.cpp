@@ -10,14 +10,12 @@
 
 using namespace std;
 
-volatile sig_atomic_t stop;
-
 // supposed to be global (FIX: maybe change to define later)
 int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
-double sampleTime = 0.1; // seconds
+double sampleTime = 0.01; // seconds
 double targetAngle = 0; // FIX: this is how the imu is set if you push it all the way down
 double Kp; 
 double Kd; 
@@ -32,10 +30,14 @@ double err, prev_error=0, error_sum=0;
 int count = 0;
 int distanceCm;
 double iTerm = 0;
+TWBR robot(p1,d1,p2,d2);
 
-
-void inthand(int signum) {
-	stop = 1;
+// sigint handling - NOT WORKING
+static volatile bool keepRunning = true;
+void intHandler(int signum) {
+	keepRunning = false;
+	robot.wait(1000);
+	cout << "intHandler called\n";
 }
 
 void PID (double& motorPower, int& direction)
@@ -45,7 +47,7 @@ void PID (double& motorPower, int& direction)
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
-	gyroAngle = gyroRate*sampleTime; // degrees
+	gyroAngle = gyroRate*sampleTime; // degrees - FIX: should make more precise in timing
 
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 	
@@ -64,7 +66,7 @@ void PID (double& motorPower, int& direction)
 
 	prevAngle = currentAngle;
 
-//	motorPower = 0; //DELETE: for testing without running motors
+//	motorPower = 0; //DEBUGGING: for testing without running motors
 //	return;
 
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
@@ -82,7 +84,6 @@ void PID (double& motorPower, int& direction)
 
 int main(int argc, char** argv) {
 
-	TWBR robot(p1,d1,p2,d2);
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
@@ -98,7 +99,9 @@ int main(int argc, char** argv) {
 	double motorPower;
 	int direction;
 
-	while (1) {
+	signal (SIGINT,intHandler);
+
+	while (keepRunning) {
 	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;

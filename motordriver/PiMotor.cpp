@@ -31,6 +31,11 @@ void TWBR::wait (double ms)
 	usleep (ms*1000.0);
 }
 
+void TWBR::stop()
+{
+	gpioTerminate();
+}
+
 PiMotor::PiMotor() {}
 
 PiMotor::PiMotor(int motorID_, int pwmPin_, int dirPin_) {
