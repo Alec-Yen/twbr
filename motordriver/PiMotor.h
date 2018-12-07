@@ -6,7 +6,7 @@ class PiMotor {
 		int motorID; // either 0 (for the left) or 1 (for the right)
 		int pwmPin;
 		int dirPin;
-		bool DEBUG = false;
+		bool DEBUG;
 	public:
 		PiMotor();
 		PiMotor(int,int,int);
