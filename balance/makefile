@@ -1,6 +1,6 @@
 BIN = bin/
 OBJ = obj/
-FLAGS = -std=c++98 -Wall
+FLAGS = -std=c++11 -Wall
 
 all: $(BIN)balance $(BIN)stop
 

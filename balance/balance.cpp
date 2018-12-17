@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <signal.h>
+#include <thread>
 #include "PiMotor.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"
@@ -22,28 +23,18 @@ double Kd;
 double Ki; 
 double RAD_TO_DEG = 180.0/3.14;
 int MAX_MOTOR = 100;
+double iTerm = 0;
+bool break_condition = false;
 
 // FIX: don't make these global 
-double accY, accZ, gyroX;
-double accAngle, gyroAngle, currentAngle, prevAngle=0;
-double err, prev_error=0, error_sum=0;
-int count = 0;
-int distanceCm;
-double iTerm = 0;
 TWBR robot(p1,d1,p2,d2);
-
-// sigint handling - NOT WORKING
-static volatile bool keepRunning = true;
-void intHandler(int signum) {
-	keepRunning = false;
-	robot.wait(1000);
-	cout << "intHandler called\n";
-}
+double accY, accZ, gyroX;
 
 void PID (double& motorPower, int& direction)
 {
-	double gyroRate, changeInAngle,pTerm,dTerm;
-
+	double err,gyroRate, changeInAngle,pTerm,dTerm;
+	double accAngle, gyroAngle, currentAngle, prevAngle=0;
+	
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
@@ -59,10 +50,8 @@ void PID (double& motorPower, int& direction)
 
 //	printf("gyroRate = %.2f\t gyroAngle %.6f\n",gyroRate, gyroAngle);
 	printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
-
 	motorPower = pTerm + iTerm + dTerm;
 	printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t",pTerm,iTerm,dTerm);
-
 
 	prevAngle = currentAngle;
 
@@ -82,8 +71,34 @@ void PID (double& motorPower, int& direction)
 
 }
 
-int main(int argc, char** argv) {
+void Balance (MPU6050 mpu)
+{
+	double motorPower;
+	int direction;
 
+	while(!break_condition) {
+	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
+		accY = mpu.getAccelerationY()/16384.0;
+		accZ = mpu.getAccelerationZ()/16384.0;
+		gyroX = mpu.getRotationX()/131.0;
+		PID(motorPower,direction);
+		robot.moveSame(direction,motorPower,sampleTime*1000); // third argument is in milliseconds
+	}
+}
+
+void Stop ()
+{
+	char q;
+	cin >> q;
+	if (q == 'q') {
+		break_condition = true;
+		cout << "Breaking out of loop\n";
+		robot.wait(1000);
+	}
+}
+
+int main(int argc, char** argv)
+{
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
@@ -96,20 +111,13 @@ int main(int argc, char** argv) {
 	Ki = atof(argv[2]);
 	Kd = atof(argv[3]);
 
-	double motorPower;
-	int direction;
+	thread loop_thread (Balance,mpu);
+	thread break_thread (Stop);
 
-	signal (SIGINT,intHandler);
+	loop_thread.join();
+	break_thread.join();
 
-	while (keepRunning) {
-	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
-		accY = mpu.getAccelerationY()/16384.0;
-		accZ = mpu.getAccelerationZ()/16384.0;
-		gyroX = mpu.getRotationX()/131.0;
-		PID(motorPower,direction);
-		robot.moveSame(direction,motorPower,sampleTime*1000); // third argument is in milliseconds
-	}
-
+	cout << "Threads joined successfully\n";
 
 	return 0;
 }
