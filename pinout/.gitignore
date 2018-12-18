@@ -1,0 +1,16 @@
+#blacklist everything
+*
+
+#then, whitelist directories
+!*/
+!*.gitignore
+
+#library files
+!*.PcbLib
+!*.SchLib
+!*.LibPkg
+
+#project files
+!*.SchDoc
+!*.PcbDoc
+!*.PrjPcb
