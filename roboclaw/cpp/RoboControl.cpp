@@ -10,5 +10,6 @@ using namespace std;
 int main(){
 	RoboClaw robo("/dev/serial0",38400);
 	while(1) robo.ForwardM1(address, 60);
+
 	return 0;
 }
