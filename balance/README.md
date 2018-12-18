@@ -14,12 +14,14 @@ TO DO:
 Switch to Roboclaw
 Secure IMU so it is as close to aligned as possible
 Get precise starting angle
-Write code to handle SIGINT
-Wirte code to get accurate sample time
 3D print new mounting to put Pi and motor driver on middle layer
 3D print entire chassis
 Add training wheels or similar
 
+
+LATER:
+Write code to handle SIGINT
+Wirte code to get accurate sample time
 
 DEAN'S SUGGESTIONS
 Increase max speed

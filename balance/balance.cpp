@@ -41,9 +41,9 @@ void PID (double& motorPower, int& direction)
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
 	gyroAngle = gyroRate*sampleTime; // degrees - FIX: should make more precise in timing
-
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 	
+	// PID calculations
 	err = currentAngle - targetAngle; // targetAngle is 0
 	changeInAngle = currentAngle - prevAngle;
 	pTerm = Kp*err;
@@ -53,16 +53,18 @@ void PID (double& motorPower, int& direction)
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
 
+	// max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
-	// determine direction and absolute power
+	// determine direction and get magnitude of power
 	if (motorPower < 0) {
 		direction = 1;
 		motorPower *= -1;
 	}
 	else direction = 0;
 
+	// print statements
 	printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
 	printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
@@ -72,6 +74,7 @@ void PID (double& motorPower, int& direction)
 	}
 
 }
+
 
 void Balance ()
 {
@@ -99,7 +102,7 @@ void Stop ()
 	if (q == 'q') {
 		break_condition = true;
 		cout << "Breaking out of loop\n";
-		robot.wait(1000);
+		robot.stop(); // also calls gpioTerminate()
 	}
 }
 
