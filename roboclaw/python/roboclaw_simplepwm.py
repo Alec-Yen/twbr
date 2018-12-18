@@ -4,12 +4,14 @@ from roboclaw import Roboclaw
 #Windows comport name
 #rc = Roboclaw("COM9",38400)
 #Linux comport name
-rc = Roboclaw("/dev/ttyACM0",38400)
+#rc = Roboclaw("/dev/ttyACM0",38400)
+rc = Roboclaw("/dev/serial0",38400)
 
 rc.Open()
 address = 0x80
 
 while(1):
+        rc.ForwardM1(address,0)
 	rc.ForwardM1(address,60)	#1/4 power forward
 	rc.BackwardM2(address,32)	#1/4 power backward
 	time.sleep(2)
