@@ -21,7 +21,7 @@ Add training wheels or similar
 
 LATER:
 Write code to handle SIGINT
-Wirte code to get accurate sample time
+
 
 DEAN'S SUGGESTIONS
 Increase max speed
