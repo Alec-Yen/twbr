@@ -1,4 +1,2 @@
-*/bin/*
 *.o
 *.pyc
-!*/bin/.keep

@@ -1,10 +1,11 @@
+This directory includes cpp and python code. We aren't currently using any of the code. See balance directory for application of imu code. Edited: 12/20/18
+
+
 Issues: <br / >
 Needing to use sudo commands on pi for some reason. <br />
-The IMU appears extraordinarily sensitive.
-
-Cpp Code: https://github.com/jrowberg/i2cdevlib
 
 
+Cpp Code: https://github.com/jrowberg/i2cdevlib <br />
 Cpp Dependencies: bcm2835
 
 
