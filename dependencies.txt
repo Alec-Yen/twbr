@@ -1,7 +1,7 @@
 Our goal is to reduce the number of 3rd party dependencies.
 
 LIBRARIES
-bcm2835		// for imu (see /imu)
+bcm2835		// for MPU6050 (see /imu)
 pigpio		// for motor driver (see /motordriver)
 rt				// for motor driver
 pthread		// for motor driver
@@ -12,3 +12,30 @@ imu/Arduino_MPU6050 imu/Arduino_MPU6050/MPU6050.cpp
 
 MISCELLANEOUS
 Currently using C++11 for multithreading to safely stop balance/bin/balance code
+
+USEFUL GIT REPOS
+https://github.com/jrowberg/i2cdevlib								// for MPU6050
+https://github.com/Steve136/RasPi-DC-Motor-Class		// for motor driver
+
+
+INSTRUCTIONS
+
+1. To install pigpio, run:
+
+rm pigpio.zip
+sudo rm -rf PIGPIO
+wget abyz.me.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+cd PIGPIO
+make
+sudo make install
+
+2. To install bcm2835, run:
+
+wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.58.tar.gz
+tar zxvf bcm2835-1.58.tar.gz
+cd bcm2835-1.58
+./configure
+make
+sudo make check
+sudo make install
