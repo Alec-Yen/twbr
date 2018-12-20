@@ -1,10 +1,10 @@
-BIN = bin/
-OBJ = obj/
+BIN = bin
+OBJ = obj
 
-all: motor 
+all: $(BIN)/motor 
 
 clean:
-	rm -f *.o $(BIN)motor
+	rm -f *.o $(BIN)/motor
 
-motor: motor.cpp
-	g++ -o $(BIN)motor -I. PiMotor.cpp motor.cpp -lpigpio -lrt -lpthread
+$(BIN)/motor: motor.cpp
+	g++ -o $(BIN)/motor -I. PiMotor.cpp motor.cpp -lpigpio -lrt -lpthread
