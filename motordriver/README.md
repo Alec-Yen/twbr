@@ -1,1 +1,3 @@
-The code in this directory does not work. Currently revamping the guy's code in RasPi-Dc-Motor-Class to work with our motor driver which a PWM and DIR pin, instead of 2 PWM pins.
+RasPi-DC-Motor-Class was the inspiration for our motor driver code. Code currently works, but still needs to be cleaned up. Edited 12/20/2018 <br />
+
+Cpp code: https://github.com/Steve136/RasPi-DC-Motor-Class
