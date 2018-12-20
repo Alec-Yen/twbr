@@ -11,12 +11,17 @@ https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/16311/www/s18/labs/lab04/pr
 
 
 TO DO:
-Switch to Roboclaw
-Secure IMU so it is as close to aligned as possible
+Switch to Roboclaw (?)
+Switch from PIGPIO to WiringPi
+
 Get precise starting angle
-3D print new mounting to put Pi and motor driver on middle layer
+Measure battery voltage
+Add LCD screen to read angle
+
 3D print entire chassis
-Add training wheels or similar
+	Secure IMU so it is as close to aligned as possible
+	Add training wheels or similar
+	3D print new mounting to put Pi and motor driver on middle layer
 
 
 LATER:

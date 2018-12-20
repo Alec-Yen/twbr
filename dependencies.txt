@@ -1,10 +1,10 @@
 Our goal is to reduce the number of 3rd party dependencies.
 
 LIBRARIES
-bcm2835		// for MPU6050 (see /imu)
-pigpio		// for motor driver (see /motordriver)
-rt				// for motor driver
-pthread		// for motor driver
+bcm2835 // for MPU6050 (see /imu)
+pigpio // for motor driver (see /motordriver)
+rt // for motor driver
+pthread // for motor driver
 
 3RD PARTY INCLUDES
 imu/RaspberryPi_bcm2835/I2Cdev imu/RaspberryPi_bcm2835/I2Cdev/I2Cdev.cpp
@@ -14,8 +14,8 @@ MISCELLANEOUS
 Currently using C++11 for multithreading to safely stop balance/bin/balance code
 
 USEFUL GIT REPOS
-https://github.com/jrowberg/i2cdevlib								// for MPU6050
-https://github.com/Steve136/RasPi-DC-Motor-Class		// for motor driver
+https://github.com/jrowberg/i2cdevlib // for MPU6050
+https://github.com/Steve136/RasPi-DC-Motor-Class // for motor driver
 
 
 INSTRUCTIONS
