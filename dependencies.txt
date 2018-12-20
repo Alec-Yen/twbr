@@ -2,7 +2,8 @@ Our goal is to reduce the number of 3rd party dependencies.
 
 LIBRARIES
 bcm2835 // for MPU6050 (see /imu)
-pigpio // for motor driver (see /motordriver)
+pigpio // for motor driver (see /motors_pigpio)
+wiringPi // for motor driver (see /motors_wiringpi)
 rt // for motor driver
 pthread // for motor driver
 
@@ -22,6 +23,7 @@ INSTRUCTIONS
 
 1. To install pigpio, run:
 
+cd
 rm pigpio.zip
 sudo rm -rf PIGPIO
 wget abyz.me.uk/rpi/pigpio/pigpio.zip
@@ -30,8 +32,17 @@ cd PIGPIO
 make
 sudo make install
 
-2. To install bcm2835, run:
+2. To install wiringPi, run:
 
+cd
+git clone git://git.drogon.net/wiringPi
+cd wiringPi
+git pull origin
+./build
+
+3. To install bcm2835, run:
+
+cd
 wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.58.tar.gz
 tar zxvf bcm2835-1.58.tar.gz
 cd bcm2835-1.58
