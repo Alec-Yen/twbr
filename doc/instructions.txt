@@ -1,4 +1,5 @@
 INSTRUCTIONS
+Following is how to install the various dependencies (that we are trying to remove eventually).
 
 1. To install pigpio, run:
 

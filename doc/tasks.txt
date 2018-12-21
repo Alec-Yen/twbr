@@ -1,9 +1,11 @@
-TO DO:
+TODO:
 
 Alec:
-Understand Roboclaw
-	Possibly figure out how to use Pi for encoders
+Understand Roboclaw - I did find working C code for Roboclaw that has no dependencies
 Use Arduino to measure batt voltage and communicate to Pi
+Write down dependencies
+Write c++98 compatible code to handle interrupt for balance code
+Find C compatible code (no dependencies) for MPU6050
 
 
 Yaw:
