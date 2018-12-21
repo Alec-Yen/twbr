@@ -6,9 +6,9 @@ INC = include
 CC = gcc
 CXX = g++ -std=c++98
 DEBUG = -g
-CFLAGS = -O3 -Wall -c $(DEBUG)
-CXX_FLAGS = -O3 -Wall -c $(DEBUG)
-LFLAGS = -O3 -Wall $(DEBUG)
+CFLAGS = -O3 -Wall -c $(DEBUG) -lpthread
+CXX_FLAGS = -O3 -Wall -c $(DEBUG) -lpthread
+LFLAGS = -O3 -Wall $(DEBUG) -lpthread
 
 TWBR = $(BIN)/encoders $(BIN)/encoders_thread
 EXAMPLES = $(BIN)/roboclaw-test
