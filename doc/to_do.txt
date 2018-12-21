@@ -1,8 +1,13 @@
 TO DO:
-Figure out how to use Pi for encoders
-Measure battery voltage
 
-3D print entire chassis
+Alec:
+Understand Roboclaw
+	Possibly figure out how to use Pi for encoders
+Use Arduino to measure batt voltage and communicate to Pi
+
+
+Yaw:
+3D print chassis
 	Secure IMU so it is as close to aligned as possible
 		Get precise starting angle
 	Add training wheels or similar

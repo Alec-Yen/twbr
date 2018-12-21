@@ -31,7 +31,7 @@ double prevAngle = 0;
 bool break_condition = false;
 clock_t prev_t;
 
-// FIX: try to not to make global
+// TODO: try to not to make global
 TWBR robot(p1,d1,p2,d2);
 double accY, accZ, gyroX;
 
@@ -41,7 +41,7 @@ void PID (double& motorPower, int& direction)
 	double accAngle, gyroAngle, currentAngle;
 	double sampleTime;
 	
-	// calculate sampleTime (FIX: calculations not working)
+	// calculate sampleTime (TODO: calculations not working)
 	sampleTime = 0.01;
 	//clock_t curr_t = clock();
 	//sampleTime = (double)(curr_t-prev_t)/CLOCKS_PER_SEC;
