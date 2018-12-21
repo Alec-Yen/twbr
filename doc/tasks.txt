@@ -6,6 +6,7 @@ Use Arduino to measure batt voltage and communicate to Pi
 Write down dependencies
 Write c++98 compatible code to handle interrupt for balance code
 Find C compatible code (no dependencies) for MPU6050
+Take a look at http://www.pieter-jan.com/node/15
 
 
 Yaw:

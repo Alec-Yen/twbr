@@ -14,3 +14,7 @@ Best combo with battery at top: 60 .5 .5
 Max Speed 70, Sample Time: 0.01 s
 Writing code to get accurate sample time seemed detrimental for some reason
 A "standoff" was used with the IMU to keep in place, didn't seem to do very much. It seems that there will have to be other measures taken to keep the robot from moving off in one direction completely.
+
+12/21/2018
+Raspberry Pi - imu, roboclaw, lcd
+Arduino - batt, ultrasonic

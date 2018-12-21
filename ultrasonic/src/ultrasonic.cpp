@@ -9,7 +9,7 @@
 void sonarTrigger(void);
 void sonarEcho(int gpio, int level, uint32_t tick);
 
-int main(int argc, char *argv[])
+int main()
 {
 	if (gpioInitialise()<0) return 1;
 

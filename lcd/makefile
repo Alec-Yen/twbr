@@ -1,13 +1,16 @@
-BIN = bin/
-OBJ = obj/
-INCLUDE = -I./lcd_i2c/
-LIBS = ./lcd_i2c/lcd_i2c.a
-FLAGS = -std=c++11 -Wall
+BIN = bin
+OBJ = obj
+INC = include
+SRC = src
+LIBS = $(INC)/LiquidCrystal_I2C.a
 
-all: $(BIN)clock
+CXX = g++ -std=c++11
+CXX_FLAGS = -g -Wall
+
+all: $(BIN)/clock
 
 clean:
-	rm -f *.o $(BIN)clock
+	rm -f *.o $(BIN)/clock
 
-$(BIN)clock: clock.cpp
-	g++ -o $(BIN)clock clock.cpp $(INCLUDE) $(LIBS)
+$(BIN)/clock: $(SRC)/clock.cpp
+	$(CXX) $(CXX_FLAGS) -o $(BIN)/clock $(SRC)/clock.cpp -I$(INC) $(LIBS)

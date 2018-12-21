@@ -1,15 +1,36 @@
+SRC = src
 BIN = bin
 OBJ = obj
-LCD = -I../lcd/lcd_i2c/ ../lcd/lcd_i2c/lcd_i2c.a
-FLAGS = -std=c++11 -Wall
+INC = $(BASEDIR)/lcd/include
+STATIC_LIBS = $(INC)/LiquidCrystal_I2C.a
+LIBS = -lpigpio -lrt -lpthread
 
-all: $(BIN)/ultrasonic  $(BIN)/lcd_print
+BASEDIR = ..
+
+CC = gcc
+CXX = g++ -std=c++98
+DEBUG = -g
+CFLAGS = -O3 -Wall -c $(DEBUG)
+CXX_FLAGS = -O3 -Wall -c $(DEBUG)
+LFLAGS = -O3 -Wall $(DEBUG)
+
+
+
+BIN_FILES = $(BIN)/ultrasonic  $(BIN)/lcd_print
+
+all: $(BIN_FILES)
+
+
+$(BIN)/ultrasonic: $(SRC)/ultrasonic.cpp
+	$(CXX) $(LFLAGS) -o $(BIN)/ultrasonic $(SRC)/ultrasonic.cpp $(LIBS)
+
+$(BIN)/lcd_print: $(SRC)/lcd_print.cpp
+	$(CXX) $(LFLAGS) -o $(BIN)/lcd_print $(SRC)/lcd_print.cpp -I$(INC) $(STATIC_LIBS) $(LIBS)
+
 
 clean:
-	rm -f *.o $(BIN)/ultrasonic
+	rm -f $(OBJ)/*.o $(BIN_FILES)
 
-$(BIN)/ultrasonic: ultrasonic.cpp
-	g++ $(FLAGS) -o $(BIN)/ultrasonic ultrasonic.cpp -lpigpio -lrt -lpthread
 
-$(BIN)/lcd_print: lcd_print.cpp
-	g++ $(FLAGS) -o $(BIN)/lcd_print lcd_print.cpp $(LCD) -lpigpio -lrt -lpthread
+
+

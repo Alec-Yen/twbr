@@ -2,7 +2,7 @@ Our goal is to reduce the number of 3rd party dependencies.
 
 INSTALLED LIBRARIES
 bcm2835 // for MPU6050
-pigpio // for driver and ultrasonic
+pigpio // for MDD10A and ultrasonic
 libi2c-dev // for LCD
 
 
@@ -19,6 +19,6 @@ Currently using C++11 for multithreading to safely stop balance/bin/balance code
 
 USEFUL GIT REPOS
 https://github.com/jrowberg/i2cdevlib // for MPU6050
-https://github.com/Steve136/RasPi-DC-Motor-Class // for driver
+https://github.com/Steve136/RasPi-DC-Motor-Class // for MDD10A
 https://github.com/oniongarlic/liquidcrystal-i2c // for LCD
 
