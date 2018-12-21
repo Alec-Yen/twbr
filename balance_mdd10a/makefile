@@ -14,11 +14,11 @@ LIBS = -lpigpio -lrt -l bcm2835 -l m
 BASEDIR = ..
 
 BIN_FILES = $(BIN)/balance $(BIN)/balance_pthread $(BIN)/stop
-IMU_DIR = $(BASEDIR)/imu/cpp
-MOTOR_DIR = $(BASEDIR)/motors
+IMU_DIR = $(BASEDIR)/mpu6050
+MOTOR_DIR = $(BASEDIR)/mdd10a
 	
 
-IMU_INC =  -I $(IMU_DIR)/Arduino_MPU6050 $(IMU_DIR)/Arduino_MPU6050/MPU6050.cpp -I $(IMU_DIR)/RaspberryPi_bcm2835/I2Cdev $(IMU_DIR)/RaspberryPi_bcm2835/I2Cdev/I2Cdev.cpp
+IMU_INC =  -I$(IMU_DIR) $(IMU_DIR)/MPU6050.cpp -I$(IMU_DIR) $(IMU_DIR)/I2Cdev.cpp
 MOTOR_INC = -I $(MOTOR_DIR) $(MOTOR_DIR)/PiMotor.cpp
 
 

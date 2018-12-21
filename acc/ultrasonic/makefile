@@ -1,11 +1,11 @@
 SRC = src
 BIN = bin
 OBJ = obj
-INC = $(BASEDIR)/lcd/include
+INC = $(BASEDIR)/acc/lcd/include
 STATIC_LIBS = $(INC)/LiquidCrystal_I2C.a
 LIBS = -lpigpio -lrt -lpthread
 
-BASEDIR = ..
+BASEDIR = ../..
 
 CC = gcc
 CXX = g++ -std=c++98

@@ -1,12 +1,11 @@
 TODO:
 
 Alec:
-Roboclaw encoder measurements
+Write balance code using Roboclaw
 Use Arduino to measure batt voltage and communicate to Pi
 
-Write c++98 compatible code to handle interrupt for balance code
+Understand Roboclaw encoder measurements
 Find C compatible code (no dependencies) for MPU6050
-Take a look at http://www.pieter-jan.com/node/15
 
 
 Yaw:
@@ -18,10 +17,9 @@ Yaw:
 
 
 LATER:
-Write code to handle SIGINT
-Add LCD screen to read angle
-Switch to Roboclaw (?)
-Switch from PIGPIO to WiringPi (?)
+Test c++98 compatible code to handle interrupt for balance code
+Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
+
 
 
 DEAN'S SUGGESTIONS
