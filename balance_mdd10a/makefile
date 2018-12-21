@@ -18,19 +18,15 @@ IMU_DIR = $(BASEDIR)/mpu6050
 MOTOR_DIR = $(BASEDIR)/mdd10a
 	
 
-IMU_INC =  -I$(IMU_DIR) $(IMU_DIR)/MPU6050.cpp -I$(IMU_DIR) $(IMU_DIR)/I2Cdev.cpp
-MOTOR_INC = -I $(MOTOR_DIR) $(MOTOR_DIR)/PiMotor.cpp
+IMU_INC =  -I$(IMU_DIR)/$(INC) $(IMU_DIR)/$(SRC)/MPU6050.cpp $(IMU_DIR)/$(SRC)/I2Cdev.cpp
+MOTOR_INC = -I$(MOTOR_DIR)/$(INC) $(MOTOR_DIR)/$(SRC)/PiMotor.cpp
 
 
 all: $(BIN_FILES)
-balance: $(BIN)/balance
-stop: $(BIN)/stop
-
 
 $(BIN)/balance_pthread: $(SRC)/balance_pthread.cpp
 	$(CXX) $(LFLAGS) -o $(BIN)/balance_pthread $(SRC)/balance_pthread.cpp \
 	$(MOTOR_INC) $(IMU_INC) $(LIBS)
-
 
 $(BIN)/balance: $(SRC)/balance.cpp
 	g++ -std=c++11 $(LFLAGS) -o $(BIN)/balance $(SRC)/balance.cpp \
@@ -39,6 +35,7 @@ $(BIN)/balance: $(SRC)/balance.cpp
 $(BIN)/stop: $(SRC)/stop.cpp
 	$(CXX) $(LFLAGS) -o $(BIN)/stop $(SRC)/stop.cpp \
 	$(MOTOR_INC) $(LIBS)
+
 
 
 
