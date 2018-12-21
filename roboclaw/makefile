@@ -10,12 +10,18 @@ CFLAGS = -O3 -Wall -c $(DEBUG)
 CXX_FLAGS = -O3 -Wall -c $(DEBUG)
 LFLAGS = -O3 -Wall $(DEBUG)
 
-TWBR = $(BIN)/encoders
+TWBR = $(BIN)/encoders $(BIN)/encoders_thread
 EXAMPLES = $(BIN)/roboclaw-test
 	
 
 all : $(TWBR) $(EXAMPLES)
 examples: $(EXAMPLES)
+
+$(BIN)/encoders_thread : $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o
+	$(CXX) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o -o $(BIN)/encoders_thread
+
+$(OBJ)/encoders_thread.o: $(SRC)/encoders_thread.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INC) $(SRC)/encoders_thread.cpp -o $(OBJ)/encoders_thread.o
 
 $(BIN)/encoders : $(OBJ)/roboclaw.o $(OBJ)/encoders.o
 	$(CXX) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/encoders.o -o $(BIN)/encoders
@@ -40,4 +46,4 @@ $(OBJ)/roboclaw-test.o : $(INC)/roboclaw.h $(SRC)/roboclaw-test.c
 
 
 clean:
-	\rm -f $(OBJ)/*.o $(ROBOCLAW) $(EXAMPLES) $(TWBR)
+	rm -f $(OBJ)/*.o $(EXAMPLES) $(TWBR)
