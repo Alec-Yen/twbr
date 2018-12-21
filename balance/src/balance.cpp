@@ -40,11 +40,10 @@ void PID (double& motorPower, int& direction)
 	double err,gyroRate,changeInAngle,pTerm,dTerm;
 	double accAngle, gyroAngle, currentAngle;
 	double sampleTime;
-	clock_t curr_t;
 	
 	// calculate sampleTime (FIX: calculations not working)
 	sampleTime = 0.01;
-	//curr_t = clock();
+	//clock_t curr_t = clock();
 	//sampleTime = (double)(curr_t-prev_t)/CLOCKS_PER_SEC;
 	//prev_t = curr_t;
 
