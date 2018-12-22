@@ -1,10 +1,8 @@
 TODO:
 
 Alec:
-Write balance code using Roboclaw
+Write code to move forward and turn
 Use Arduino to measure batt voltage and communicate to Pi
-
-Understand Roboclaw encoder measurements
 Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
 
 Yaw:
@@ -16,7 +14,9 @@ Yaw:
 
 
 LATER:
-Physically test c++98 compatible code to handle interrupt for balance code
+Physically test balance_pthread code using MDD10A
+Physically test balance code using Roboclaw
+Write code to estimate position using Roboclaw encoder count (1920 counts per revolution)
 
 
 

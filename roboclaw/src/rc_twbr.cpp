@@ -12,6 +12,7 @@ TWBR::TWBR(string tty_, int baudrate_, uint8_t address_)
 
 TWBR::~TWBR()
 {
+	moveSame (0,1000);
 	if (roboclaw_close (rc) != ROBOCLAW_OK)
 		cerr << "Unable to shutdown roboclaw cleanly\n";
 	else cout << "Shutdown roboclaw successfully\n";

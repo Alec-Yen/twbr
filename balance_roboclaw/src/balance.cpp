@@ -13,7 +13,7 @@
 using namespace std;
 
 // global variables
-bool PRINT = 1; // set to 1 to print out angles and PID terms
+bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
@@ -30,9 +30,11 @@ double iTerm = 0;
 double prevAngle = 0;
 bool break_condition = false;
 clock_t prev_t;
+pthread_mutex_t lock; // for thread safe code
 
 // TODO: try to not to make global
 double accY, accZ, gyroX;
+
 
 void PID (double& motorPower)
 {
@@ -71,8 +73,8 @@ void PID (double& motorPower)
 
 
 	// print statements
-	if (PRINT) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
-	if (PRINT) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
+	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
+	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
 	if (DEBUG) {
 		motorPower = 0; //DEBUGGING: for testing without running motors
@@ -98,7 +100,10 @@ void* Balance (void* robot_)
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
 		PID(motorPower);
+
+		pthread_mutex_lock (&lock);
 		robot->moveSame(motorPower,motorTime*1000); // third argument is in milliseconds
+		pthread_mutex_unlock (&lock);
 	}
 	return NULL;
 }
@@ -106,31 +111,35 @@ void* Balance (void* robot_)
 void* Stop (void* robot_)
 {
 	char q;
-
 	TWBR* robot = (TWBR *)robot_;
 
-	cin >> q;
-	if (q == 'q') {
-		break_condition = true;
-		cout << "Breaking out of loop\n";
-		sleep(1);
-		delete robot;
+	while (!break_condition) {
+		cin >> q;
+		if (q == 'q') {
+			break_condition = true;
+			cout << "Breaking out of loop\n";
+	
+			pthread_mutex_lock (&lock);
+			delete robot;
+			pthread_mutex_unlock (&lock);
+		}
+		cin.clear();
 	}
 	return NULL;
 }
 
 int main(int argc, char** argv)
 {
-
-	pthread_t loop_thread, break_thread;
-
-	if (argc != 4) {
-		cerr << "usage: sudo ./bin/balance Kp Ki Kd\n";
+	if (argc != 6) {
+		fprintf(stderr,"usage: sudo %s Kp Ki Kd PRINT_ANGLE DEBUG\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 60 .5 .5 0 0\n",argv[0]);;
 		return 1;
 	}
 	Kp = atof(argv[1]);
 	Ki = atof(argv[2]);
 	Kd = atof(argv[3]);
+	PRINT_ANGLE = atoi(argv[4]);
+	DEBUG = atoi(argv[5]);
 
 	// initialize everything
 	uint8_t address=0x80; //address of roboclaw unit
@@ -140,11 +149,13 @@ int main(int argc, char** argv)
 	prev_t = clock();
 	
 	// multithreading
+	pthread_t loop_thread, break_thread;
+
+	pthread_mutex_init (&lock, NULL);
 	pthread_create (&loop_thread, NULL, Balance, robot);
 	pthread_create (&break_thread, NULL, Stop, robot);
-
-	pthread_exit (NULL);
-
+	pthread_join (loop_thread, NULL);
+	pthread_join (break_thread, NULL);
 	cout << "Threads joined successfully\n";
 
 	return 0;

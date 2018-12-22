@@ -14,24 +14,27 @@ LIBS = -l bcm2835 -l m
 
 BASEDIR = ..
 
-BIN_FILES = $(BIN)/MPU6050_example_1
-OBJ_FILES = $(OBJ)/MPU6050.o $(OBJ)/I2Cdev.o $(OBJ)/MPU6050_example_1.o
-	
+BIN_FILES = $(BIN)/MPU6050_example_1 $(BIN)/imu_readings
+OBJ_FILES = $(OBJ)/MPU6050.o $(OBJ)/I2Cdev.o
+INC_FILES = $(INC)/MPU6050.h $(INC)/I2Cdev.h
+
 
 all : $(BIN_FILES)
 
+$(OBJ)/%.o : $(TEST)/%.cpp $(INC_FILES)
+	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< $(LIBS)
 
-$(BIN)/MPU6050_example_1: $(OBJ_FILES)
-	$(CC) $(LFLAGS) -o $(BIN)/MPU6050_example_1 $(OBJ_FILES) $(LIBS)
+$(OBJ)/%.o : $(SRC)/%.cpp $(INC_FILES)
+	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< $(LIBS)
 
-$(OBJ)/MPU6050_example_1.o: $(TEST)/MPU6050_example_1.cpp
-	$(CC) $(CXX_FLAGS) -o $(OBJ)/MPU6050_example_1.o -I$(INC) $(TEST)/MPU6050_example_1.cpp $(LIBS)
 
-$(OBJ)/MPU6050.o: $(SRC)/MPU6050.cpp $(INC)/MPU6050.h
-	$(CC) $(CXX_FLAGS) -o $(OBJ)/MPU6050.o -I$(INC) $(SRC)/MPU6050.cpp $(LIBS)
 
-$(OBJ)/I2Cdev.o: $(SRC)/I2Cdev.cpp $(INC)/I2Cdev.h
-	$(CC) $(CXX_FLAGS) -o $(OBJ)/I2Cdev.o -I$(INC) $(SRC)/I2Cdev.cpp $(LIBS)
+$(BIN)/MPU6050_example_1: $(OBJ)/MPU6050_example_1.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) -o $@ $^ $(LIBS)
+
+$(BIN)/imu_readings : $(OBJ)/imu_readings.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) -o $@ $^ $(LIBS)
+
 
 clean:
 	rm -f $(OBJ)/*.o $(BIN_FILES)
