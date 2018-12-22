@@ -22,7 +22,7 @@ MOTOR_INC = $(MOTOR_DIR)/$(INC)/roboclaw.h $(MOTOR_DIR)/$(INC)/rc_twbr.hpp
 IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/roboclaw.o $(MOTOR_DIR)/$(OBJ)/rc_twbr.o
 
-BIN_FILES = $(BIN)/balance
+BIN_FILES = $(BIN)/balance $(BIN)/roam
 OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ)
 all: $(BIN_FILES)
 
@@ -30,6 +30,9 @@ all: $(BIN_FILES)
 
 # balance bin
 $(BIN)/balance: $(OBJ)/balance.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+$(BIN)/roam: $(OBJ)/roam.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 # balance obj

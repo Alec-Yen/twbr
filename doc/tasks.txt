@@ -1,6 +1,7 @@
 TODO:
 
 Alec:
+Write code to move forward and turn
 Use Arduino to measure batt voltage and communicate to Pi
 Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
 

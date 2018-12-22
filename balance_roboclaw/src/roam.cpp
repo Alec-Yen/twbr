@@ -13,7 +13,7 @@
 using namespace std;
 
 // global variables
-bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
+bool PRINT_ANGLE = 0; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
@@ -108,17 +108,28 @@ void* Balance (void* robot_)
 	return NULL;
 }
 
-void* Stop (void* robot_)
+void* Roam (void* robot_)
 {
 	char q;
 	TWBR* robot = (TWBR *)robot_;
 
 	while (!break_condition) {
 		cin >> q;
-		if (q == 'q') {
+		if (q == 'f') {
+			pthread_mutex_lock (&lock);
+			targetAngle = 2;
+			printf("Moving with target angle %.2f degrees\n",targetAngle);
+			pthread_mutex_unlock (&lock);
+		}
+		else if (q == 'b') {
+			pthread_mutex_lock (&lock);
+			targetAngle = -2;
+			printf("Moving with target angle %.2f degrees\n",targetAngle);
+			pthread_mutex_unlock (&lock);
+		}
+		else if (q == 'q') {
 			break_condition = true;
 			cout << "Breaking out of loop\n";
-	
 			pthread_mutex_lock (&lock);
 			delete robot;
 			pthread_mutex_unlock (&lock);
@@ -149,13 +160,13 @@ int main(int argc, char** argv)
 	prev_t = clock();
 	
 	// multithreading
-	pthread_t loop_thread, break_thread;
+	pthread_t balance_thread, roam_thread;
 
 	pthread_mutex_init (&lock, NULL);
-	pthread_create (&loop_thread, NULL, Balance, robot);
-	pthread_create (&break_thread, NULL, Stop, robot);
-	pthread_join (loop_thread, NULL);
-	pthread_join (break_thread, NULL);
+	pthread_create (&balance_thread, NULL, Balance, robot);
+	pthread_create (&roam_thread, NULL, Roam, robot);
+	pthread_join (balance_thread, NULL);
+	pthread_join (roam_thread, NULL);
 	cout << "Threads joined successfully\n";
 
 	return 0;
