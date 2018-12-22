@@ -11,7 +11,7 @@ CFLAGS = -O3 -Wall -c $(DEBUG) -lpthread
 CXX_FLAGS = -O3 -Wall -c $(DEBUG) -lpthread
 LFLAGS = -O3 -Wall $(DEBUG) -lpthread
 
-BIN_FILES = $(BIN)/encoders $(BIN)/encoders_thread $(BIN)/roboclaw-test
+BIN_FILES = $(BIN)/encoders $(BIN)/encoders_thread $(BIN)/encoders_thread_safe $(BIN)/roboclaw-test
 INC_FILES = $(INC)/roboclaw.h $(INC)/rc_twbr.hpp
 	
 
@@ -33,6 +33,9 @@ $(OBJ)/%.o: $(SRC)/%.c $(INC_FILES)
 
 
 # binary files
+
+$(BIN)/encoders_thread_safe : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders_thread_safe.o
+	$(CXX) $(LFLAGS) $^ -o $@
 
 $(BIN)/encoders_thread : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o
 	$(CXX) $(LFLAGS) $^ -o $@

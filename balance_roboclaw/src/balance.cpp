@@ -30,9 +30,11 @@ double iTerm = 0;
 double prevAngle = 0;
 bool break_condition = false;
 clock_t prev_t;
+pthread_mutex_t lock; // for thread safe code
 
 // TODO: try to not to make global
 double accY, accZ, gyroX;
+
 
 void PID (double& motorPower)
 {
@@ -98,7 +100,10 @@ void* Balance (void* robot_)
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
 		PID(motorPower);
+
+		pthread_mutex_lock (&lock);
 		robot->moveSame(motorPower,motorTime*1000); // third argument is in milliseconds
+		pthread_mutex_unlock (&lock);
 	}
 	return NULL;
 }
@@ -113,17 +118,16 @@ void* Stop (void* robot_)
 	if (q == 'q') {
 		break_condition = true;
 		cout << "Breaking out of loop\n";
-		sleep(1);
+
+		pthread_mutex_lock (&lock);
 		delete robot;
+		pthread_mutex_unlock (&lock);
 	}
 	return NULL;
 }
 
 int main(int argc, char** argv)
 {
-
-	pthread_t loop_thread, break_thread;
-
 	if (argc != 4) {
 		cerr << "usage: sudo ./bin/balance Kp Ki Kd\n";
 		return 1;
@@ -140,11 +144,13 @@ int main(int argc, char** argv)
 	prev_t = clock();
 	
 	// multithreading
+	pthread_t loop_thread, break_thread;
+
+	pthread_mutex_init (&lock, NULL);
 	pthread_create (&loop_thread, NULL, Balance, robot);
 	pthread_create (&break_thread, NULL, Stop, robot);
-
-	pthread_exit (NULL);
-
+	pthread_join (loop_thread, NULL);
+	pthread_join (break_thread, NULL);
 	cout << "Threads joined successfully\n";
 
 	return 0;
