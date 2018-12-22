@@ -15,7 +15,7 @@ class TWBR {
 		// member functions
 		TWBR(string tty_, int baudrate_, uint8_t address_);
 		~TWBR();
-		void moveSame (int pwm, double ms); // pwm: -255 to 255, ms: milliseconds
+		void moveSame (int pwm, double ms); // pwm: -100 to 100, ms: milliseconds
 		void readEncoders (int &enc1, int &enc2);
 
 		// member variables

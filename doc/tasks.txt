@@ -5,8 +5,7 @@ Write balance code using Roboclaw
 Use Arduino to measure batt voltage and communicate to Pi
 
 Understand Roboclaw encoder measurements
-Find C compatible code (no dependencies) for MPU6050
-
+Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
 
 Yaw:
 3D print chassis
@@ -17,8 +16,7 @@ Yaw:
 
 
 LATER:
-Test c++98 compatible code to handle interrupt for balance code
-Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
+Physically test c++98 compatible code to handle interrupt for balance code
 
 
 
