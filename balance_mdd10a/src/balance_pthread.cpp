@@ -1,7 +1,8 @@
-#include <cstdlib>
+// Updated balance program to work with c++98
+
+#include <stdlib.h>
 #include <stdio.h>
-#include <cmath>
-#include <iostream>
+#include <math.h>
 #include <unistd.h>
 #include <signal.h>
 #include <pthread.h>
@@ -19,22 +20,24 @@ int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
-double motorTime = 0.01; // seconds
 double targetAngle = 0;
-double Kp; 
-double Kd; 
-double Ki; 
 double RAD_TO_DEG = 180.0/3.14159;
 int MAX_MOTOR = 100;
+
+// for PID method
+double Kp, Kd, Ki; // PID coefficients 
+double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
-bool break_condition = false;
 clock_t prev_t;
+double motorTime = 0.01; // seconds
+
+// multithreading shared variables
 pthread_mutex_t lock; // for thread safe code
+bool break_condition = false;
 
-// TODO: try to not to make global
-double accY, accZ, gyroX;
 
+// calculate motor PWM from PID equation
 void PID (double& motorPower, int& direction)
 {
 	double err,gyroRate,changeInAngle,pTerm,dTerm;
@@ -51,13 +54,13 @@ void PID (double& motorPower, int& direction)
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
-
-
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 	
 	// PID calculations
+	pthread_mutex_lock (&lock);
 	err = currentAngle - targetAngle; // targetAngle is 0
+	pthread_mutex_unlock (&lock);
 	changeInAngle = currentAngle - prevAngle;
 	pTerm = Kp*err;
 	iTerm += Ki*err*sampleTime;
@@ -66,7 +69,7 @@ void PID (double& motorPower, int& direction)
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
 
-	// max power
+	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
@@ -81,27 +84,25 @@ void PID (double& motorPower, int& direction)
 	if (PRINT) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
 	if (PRINT) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
+	// debug for testing without running motors
 	if (DEBUG) {
-		motorPower = 0; //DEBUGGING: for testing without running motors
+		motorPower = 0;
 		return;
 	}
-
 }
 
-
+// balance robot
 void* Balance (void* robot_)
 {
+	double motorPower;
+	int direction;
+	TWBR* robot = (TWBR *)robot_;
+
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
-	double motorPower;
-	int direction;
-	
-	TWBR* robot = (TWBR *)robot_;
-
 	while(!break_condition) {
-	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
@@ -114,16 +115,16 @@ void* Balance (void* robot_)
 	return NULL;
 }
 
+// stop robot upon entering 'q'
 void* Stop (void* robot_)
 {
 	char q;
-
 	TWBR* robot = (TWBR *)robot_;
 
-	cin >> q;
+	scanf("%c",&q);
 	if (q == 'q') {
 		break_condition = true;
-		cout << "Breaking out of loop\n";
+		printf("Breaking out of loop\n");
 
 		pthread_mutex_lock (&lock);
 		robot->wait(1000);
@@ -133,10 +134,13 @@ void* Stop (void* robot_)
 	return NULL;
 }
 
+// main function
 int main(int argc, char** argv)
 {
+	// check command line arguments
 	if (argc != 4) {
-		cerr << "usage: sudo ./bin/balance Kp Ki Kd\n";
+		fprintf(stderr,"usage: sudo %s Kp Ki Kd\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 60 .5 .5\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);
@@ -155,7 +159,7 @@ int main(int argc, char** argv)
 	pthread_create (&break_thread, NULL, Stop, robot);
 	pthread_join (loop_thread, NULL);
 	pthread_join (break_thread, NULL);
-	cout << "Threads joined successfully\n";
+	printf("Threads joined successfully\n");
 
 	return 0;
 }

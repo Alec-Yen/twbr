@@ -1,7 +1,6 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
-#include <cmath>
-#include <iostream>
+#include <math.h>
 #include <unistd.h>
 #include <signal.h>
 #include <pthread.h>
@@ -13,29 +12,30 @@
 using namespace std;
 
 // global variables
-bool PRINT_ANGLE = 0; // set to 1 to print out angles and PID terms
+bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
-double motorTime = 0.01; // seconds
 double targetAngle = 0;
-double Kp; 
-double Kd; 
-double Ki; 
 double RAD_TO_DEG = 180.0/3.14159;
 int MAX_MOTOR = 50; // TODO: this value is going to be lower using roboclaw since it is out of 100
+
+// for PID method
+double Kp, Kd, Ki;  // PID coefficients
+double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
-bool break_condition = false;
 clock_t prev_t;
+double motorTime = 0.01; // seconds
+
+// multithreading shared variables
 pthread_mutex_t lock; // for thread safe code
-
-// TODO: try to not to make global
-double accY, accZ, gyroX;
+bool break_condition = false;
 
 
+// calculate motor PWM from PID equation
 void PID (double& motorPower)
 {
 	double err,gyroRate,changeInAngle,pTerm,dTerm;
@@ -44,21 +44,22 @@ void PID (double& motorPower)
 	
 	// calculate sampleTime (TODO: calculations not working)
 	sampleTime = 0.01;
-	//clock_t curr_t = clock();
-	//sampleTime = (double)(curr_t-prev_t)/CLOCKS_PER_SEC;
-	//prev_t = curr_t;
+//	clock_t curr_t = clock();
+//	sampleTime = (double)(curr_t-prev_t)/CLOCKS_PER_SEC;
+//	prev_t = curr_t;
+//	printf("sampleTime %.6f\n",sampleTime);
 
 
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
-
-
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 	
 	// PID calculations
+	pthread_mutex_lock (&lock);
 	err = currentAngle - targetAngle; // targetAngle is 0
+	pthread_mutex_unlock (&lock);
 	changeInAngle = currentAngle - prevAngle;
 	pTerm = Kp*err;
 	iTerm += Ki*err*sampleTime;
@@ -67,7 +68,7 @@ void PID (double& motorPower)
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
 
-	// max power
+	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
@@ -76,6 +77,7 @@ void PID (double& motorPower)
 	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
 	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
+	// debug for testing without running motors
 	if (DEBUG) {
 		motorPower = 0; //DEBUGGING: for testing without running motors
 		return;
@@ -83,19 +85,17 @@ void PID (double& motorPower)
 
 }
 
-
+// balance robot
 void* Balance (void* robot_)
 {
+	double motorPower;
+	TWBR* robot = (TWBR *)robot_;
+
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
-	double motorPower;
-	
-	TWBR* robot = (TWBR *)robot_;
-
 	while(!break_condition) {
-	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
@@ -108,37 +108,39 @@ void* Balance (void* robot_)
 	return NULL;
 }
 
+// move robot forward, backward, or stop
 void* Roam (void* robot_)
 {
 	char q;
 	TWBR* robot = (TWBR *)robot_;
 
 	while (!break_condition) {
-		cin >> q;
-		if (q == 'f') {
+		scanf ("%c",&q);
+		if (q == 'f') { // move forward
 			pthread_mutex_lock (&lock);
 			targetAngle = 2;
 			printf("Moving with target angle %.2f degrees\n",targetAngle);
 			pthread_mutex_unlock (&lock);
 		}
-		else if (q == 'b') {
+		else if (q == 'b') { // move backward
 			pthread_mutex_lock (&lock);
 			targetAngle = -2;
 			printf("Moving with target angle %.2f degrees\n",targetAngle);
 			pthread_mutex_unlock (&lock);
 		}
-		else if (q == 'q') {
+		else if (q == 'q') { // stop robot
 			break_condition = true;
-			cout << "Breaking out of loop\n";
+			printf("Breaking out of loop\n");
 			pthread_mutex_lock (&lock);
 			delete robot;
 			pthread_mutex_unlock (&lock);
 		}
-		cin.clear();
+		fflush(stdin);
 	}
 	return NULL;
 }
 
+// main function
 int main(int argc, char** argv)
 {
 	if (argc != 6) {
@@ -160,14 +162,16 @@ int main(int argc, char** argv)
 	prev_t = clock();
 	
 	// multithreading
-	pthread_t balance_thread, roam_thread;
+	pthread_t loop_thread, break_thread;
 
 	pthread_mutex_init (&lock, NULL);
-	pthread_create (&balance_thread, NULL, Balance, robot);
-	pthread_create (&roam_thread, NULL, Roam, robot);
-	pthread_join (balance_thread, NULL);
-	pthread_join (roam_thread, NULL);
-	cout << "Threads joined successfully\n";
+	pthread_create (&loop_thread, NULL, Balance, robot);
+	pthread_create (&break_thread, NULL, Roam, robot);
+
+	int pterr1 = pthread_join (loop_thread, NULL);
+	int pterr2 = pthread_join (break_thread, NULL);
+	pterr1 ? fprintf(stderr,"loop_thread error %d\n",pterr1) : printf("loop_thread joined\n");
+	pterr2 ? fprintf(stderr,"break_thread error %d\n",pterr2) : printf("break_thread joined\n");
 
 	return 0;
 }
