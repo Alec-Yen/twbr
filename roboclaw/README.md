@@ -1,12 +1,17 @@
 ## Roboclaw Motor Controller
 
 Roboclaw commands are functional, still being cleaned up. Edited 12/21/2018 <br />
-IMPORTANT: Raspberry Pi needs a common ground with RoboClaw
+
+Troubleshooting: <br />
+Raspberry Pi needs a common ground with RoboClaw <br />
+Perform PID tuning using Basicmicro Motion Studio <br />
+Reboot Pi
+Run `sudo ./bin/roboclaw-test /dev/serial0 38400 0x80`
 
 
 To run: <br />
-1. cd cpp <br />
-2. make all <br />
-3. sudo ./bin/roboclaw-test /dev/serial0 38400 0x80
+`cd cpp` <br />
+`make all` <br />
+`sudo ./bin/roboclaw-test /dev/serial0 38400 0x80`
 
 Primary Cpp Code: https://github.com/bmegli/roboclaw <br />
