@@ -2,6 +2,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 INC = include
+TEST = test
 
 CC = gcc
 CXX = g++ -std=c++98
@@ -10,40 +11,38 @@ CFLAGS = -O3 -Wall -c $(DEBUG) -lpthread
 CXX_FLAGS = -O3 -Wall -c $(DEBUG) -lpthread
 LFLAGS = -O3 -Wall $(DEBUG) -lpthread
 
-TWBR = $(BIN)/encoders $(BIN)/encoders_thread
-EXAMPLES = $(BIN)/roboclaw-test
+BIN_FILES = $(BIN)/encoders $(BIN)/encoders_thread $(BIN)/roboclaw-test
+INC_FILES = $(INC)/roboclaw.h $(INC)/rc_twbr.hpp
 	
 
-all : $(TWBR) $(EXAMPLES)
-examples: $(EXAMPLES)
+all : $(BIN_FILES)
 
-$(BIN)/encoders_thread : $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o
-	$(CXX) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o -o $(BIN)/encoders_thread
+# object files
 
-$(OBJ)/encoders_thread.o: $(SRC)/encoders_thread.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) $(SRC)/encoders_thread.cpp -o $(OBJ)/encoders_thread.o
+$(OBJ)/%.o: $(TEST)/%.cpp $(INC_FILES) 
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
-$(BIN)/encoders : $(OBJ)/roboclaw.o $(OBJ)/encoders.o
-	$(CXX) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/encoders.o -o $(BIN)/encoders
+$(OBJ)/%.o: $(SRC)/%.cpp $(INC_FILES)
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
-$(OBJ)/encoders.o: $(SRC)/encoders.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) $(SRC)/encoders.cpp -o $(OBJ)/encoders.o
+$(OBJ)/%.o: $(TEST)/%.c $(INC_FILES)
+	$(CC) $(CFLAGS) -I$(INC) $< -o $@
 
-$(OBJ)/roboclaw.o : $(INC)/roboclaw.h $(SRC)/roboclaw.c
-	$(CC) $(CFLAGS) -I$(INC) $(SRC)/roboclaw.c -o $(OBJ)/roboclaw.o
+$(OBJ)/%.o: $(SRC)/%.c $(INC_FILES)
+	$(CC) $(CFLAGS) -I$(INC) $< -o $@
 
 
+# binary files
 
+$(BIN)/encoders_thread : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o
+	$(CXX) $(LFLAGS) $^ -o $@
+
+$(BIN)/encoders : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders.o
+	$(CXX) $(LFLAGS) $^ -o $@
 
 $(BIN)/roboclaw-test : $(OBJ)/roboclaw.o $(OBJ)/roboclaw-test.o
-	$(CC) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/roboclaw-test.o -o $(BIN)/roboclaw-test
-		
-$(OBJ)/roboclaw-test.o : $(INC)/roboclaw.h $(SRC)/roboclaw-test.c
-	$(CC) $(CFLAGS) -I$(INC) $(SRC)/roboclaw-test.c -o $(OBJ)/roboclaw-test.o
-		
-
-
+	$(CC) $(LFLAGS) $^ -o $@
 
 
 clean:
-	rm -f $(OBJ)/*.o $(EXAMPLES) $(TWBR)
+	rm -f $(OBJ)/*.o $(BIN_FILES)

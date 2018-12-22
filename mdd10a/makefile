@@ -21,13 +21,13 @@ all : $(BIN_FILES)
 
 
 $(BIN)/motor: $(OBJ)/motor.o $(OBJ)/PiMotor.o
-	$(CXX) $(LFLAGS) -o $(BIN)/motor $(OBJ)/motor.o $(OBJ)/PiMotor.o $(LIBS)
+	$(CXX) $(LFLAGS) $^ $(LIBS) -o $@ 
 
-$(OBJ)/motor.o: $(TEST)/motor.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) $(TEST)/motor.cpp $(LIBS) -o $(OBJ)/motor.o
+$(OBJ)/motor.o: $(TEST)/motor.cpp $(SRC)/PiMotor.cpp $(INC)/PiMotor.h
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< $(LIBS) -o $@
 
 $(OBJ)/PiMotor.o: $(SRC)/PiMotor.cpp $(INC)/PiMotor.h
-	$(CXX) $(CXX_FLAGS) -I$(INC) $(SRC)/PiMotor.cpp $(LIBS) -o $(OBJ)/PiMotor.o
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< $(LIBS) -o $@
 
 
 clean:

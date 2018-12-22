@@ -1,0 +1,59 @@
+SRC = src
+BIN = bin
+OBJ = obj
+INC = include
+TEST = test
+
+CC = gcc
+CXX = g++ -std=c++98
+DEBUG = -g
+CFLAGS = -O3 -Wall -c $(DEBUG) -lpthread
+CXX_FLAGS = -O3 -Wall -c $(DEBUG) -lpthread
+LFLAGS = -O3 -Wall $(DEBUG) -lpthread
+
+TWBR = $(BIN)/encoders $(BIN)/encoders_thread $(OBJ)/rc_twbr.o
+EXAMPLES = $(BIN)/roboclaw-test
+	
+
+all : $(TWBR) $(EXAMPLES)
+examples: $(EXAMPLES)
+
+
+# class files
+
+$(OBJ)/roboclaw.o : $(INC)/roboclaw.h $(SRC)/roboclaw.c
+	$(CC) $(CFLAGS) -I$(INC) $(SRC)/roboclaw.c -o $(OBJ)/roboclaw.o
+
+$(OBJ)/rc_twbr.o : $(INC)/rc_twbr.hpp $(SRC)/rc_twbr.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INC) $(SRC)/rc_twbr.cpp -o $(OBJ)/rc_twbr.o
+
+
+
+# testing files
+
+$(BIN)/encoders_thread : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o
+	$(CXX) $(LFLAGS) $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders_thread.o -o $(BIN)/encoders_thread
+
+
+$(BIN)/encoders : $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders.o
+	$(CXX) $(LFLAGS) $(OBJ)/rc_twbr.o $(OBJ)/roboclaw.o $(OBJ)/encoders.o -o $(BIN)/encoders
+
+
+$(BIN)/roboclaw-test : $(OBJ)/roboclaw.o $(OBJ)/roboclaw-test.o
+	$(CC) $(LFLAGS) $(OBJ)/roboclaw.o $(OBJ)/roboclaw-test.o -o $(BIN)/roboclaw-test
+		
+$(OBJ)/encoders.o: $(TEST)/encoders.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INC) $(TEST)/encoders.cpp -o $(OBJ)/encoders.o
+
+$(OBJ)/encoders_thread.o: $(TEST)/encoders_thread.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INC) $(TEST)/encoders_thread.cpp -o $(OBJ)/encoders_thread.o
+
+$(OBJ)/roboclaw-test.o : $(INC)/roboclaw.h $(TEST)/roboclaw-test.c
+	$(CC) $(CFLAGS) -I$(INC) $(TEST)/roboclaw-test.c -o $(OBJ)/roboclaw-test.o
+		
+
+
+
+
+clean:
+	rm -f $(OBJ)/*.o $(EXAMPLES) $(TWBR)

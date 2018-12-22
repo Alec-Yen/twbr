@@ -107,6 +107,7 @@ void* Balance (void* robot_)
 		PID(motorPower,direction);
 		robot->moveSame(direction,motorPower,motorTime*1000); // third argument is in milliseconds
 	}
+	return NULL;
 }
 
 void* Stop (void* robot_)
@@ -122,6 +123,7 @@ void* Stop (void* robot_)
 		robot->wait(1000);
 		robot->stop(); // also calls gpioTerminate()
 	}
+	return NULL;
 }
 
 int main(int argc, char** argv)
