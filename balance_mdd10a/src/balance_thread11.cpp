@@ -1,6 +1,9 @@
-#include <cstdlib>
+// Program to balance robot that worked at end of Fall 2018 using MDD10A
+// Dependencies: pigpio, bcm2835, c++11
+
+#include <stdlib.h>
 #include <stdio.h>
-#include <cmath>
+#include <math.h>
 #include <iostream>
 #include <unistd.h>
 #include <signal.h>
@@ -19,22 +22,24 @@ int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
 int d1 = 23; //Left DIR
 int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
-double motorTime = 0.01; // seconds
 double targetAngle = 0;
-double Kp; 
-double Kd; 
-double Ki; 
 double RAD_TO_DEG = 180.0/3.14159;
 int MAX_MOTOR = 100;
+
+// for PID method
+double Kp, Kd, Ki; // PID coefficients 
+double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
-bool break_condition = false;
 clock_t prev_t;
+double motorTime = 0.01; // seconds
 
-// TODO: try to not to make global
+// multithreading shared variables
+bool break_condition = false;
 TWBR robot(p1,d1,p2,d2);
-double accY, accZ, gyroX;
 
+
+// calculate motor PWM from PID equation
 void PID (double& motorPower, int& direction)
 {
 	double err,gyroRate,changeInAngle,pTerm,dTerm;
@@ -51,8 +56,6 @@ void PID (double& motorPower, int& direction)
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
-
-
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 	
@@ -66,7 +69,7 @@ void PID (double& motorPower, int& direction)
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
 
-	// max power
+	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
@@ -81,25 +84,24 @@ void PID (double& motorPower, int& direction)
 	if (PRINT) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
 	if (PRINT) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
+	// debug for testing without running motors
 	if (DEBUG) {
-		motorPower = 0; //DEBUGGING: for testing without running motors
+		motorPower = 0; 
 		return;
 	}
-
 }
 
-
+// balance robot
 void Balance ()
 {
+	double motorPower;
+	int direction;
+
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
-	double motorPower;
-	int direction;
-
 	while(!break_condition) {
-	//	mpu.getMotion6(&ax,&ay,&az,&gz,&gy,&gz);
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
@@ -108,6 +110,7 @@ void Balance ()
 	}
 }
 
+// stop robot upon entering 'q'
 void Stop ()
 {
 	char q;
@@ -120,24 +123,28 @@ void Stop ()
 	}
 }
 
+// main function
 int main(int argc, char** argv)
 {
-
+	// check command line arguments
 	if (argc != 4) {
-		cerr << "usage: ./balance Kp Ki Kd\n";
+		fprintf(stderr,"usage: sudo %s Kp Ki Kd\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 60 .5 .5\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);
 	Ki = atof(argv[2]);
 	Kd = atof(argv[3]);
 
+	// initialize prev_t
 	prev_t = clock();
+
+	// multithreading
 	thread loop_thread (Balance);
 	thread break_thread (Stop);
 
 	loop_thread.join();
 	break_thread.join();
-
 	cout << "Threads joined successfully\n";
 
 	return 0;

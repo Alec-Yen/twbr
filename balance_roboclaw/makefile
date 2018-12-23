@@ -2,6 +2,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 INC = include
+TEST = test
 
 CC = gcc
 CXX = g++ -std=c++98
@@ -22,8 +23,9 @@ MOTOR_INC = $(MOTOR_DIR)/$(INC)/roboclaw.h $(MOTOR_DIR)/$(INC)/rc_twbr.hpp
 IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/roboclaw.o $(MOTOR_DIR)/$(OBJ)/rc_twbr.o
 
+INC_FILES = $(INC)/twbr.h
 BIN_FILES = $(BIN)/balance $(BIN)/roam
-OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ)
+OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ) $(OBJ)/twbr.o
 all: $(BIN_FILES)
 
 
@@ -36,30 +38,30 @@ $(BIN)/roam: $(OBJ)/roam.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 # balance obj
-$(OBJ)/%.o: $(TEST)/%.cpp
+$(OBJ)/%.o: $(TEST)/%.cpp $(INC_FILES)
 	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
-$(OBJ)/%.o: $(SRC)/%.cpp
+$(OBJ)/%.o: $(SRC)/%.cpp $(INC_FILES)
 	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 
 
 # motor obj
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.cpp $(MOTOR_INC) 
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.cpp $(MOTOR_INC)
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 # imu obj
 $(IMU_DIR)/$(OBJ)/%.o: $(IMU_DIR)/$(SRC)/%.cpp $(IMU_INC)
-	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@
 
 
 

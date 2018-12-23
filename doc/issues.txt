@@ -1,2 +1,0 @@
-ISSUES
-Need to run "sudo" on everything

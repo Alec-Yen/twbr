@@ -3,21 +3,24 @@
 
 #include <stdint.h> //uint8_t, int16_t
 #include <unistd.h>
-#include <iostream>
 #include <stdio.h>
 #include <string>
 #include "roboclaw.h"
 
 using namespace std;
 
-class TWBR {
+class RClaw {
 	public:
-		// member functions
-		TWBR(string tty_, int baudrate_, uint8_t address_);
-		~TWBR();
-		void moveSame (int pwm, double ms); // pwm: -100 to 100, ms: milliseconds
+		// member functions (future-proof)
+		RClaw(string tty_, int baudrate_, uint8_t address_);
+		~RClaw();
+		int writePWM (double pwm1, double pwm2, double ms);
 		void readEncoders (int &enc1, int &enc2);
 
+		// member functions (to be deprecated)
+		void moveSame (int pwm, double ms); // pwm: -100 to 100, ms: milliseconds
+
+	protected:
 		// member variables
 		roboclaw *rc;
 		string tty;
