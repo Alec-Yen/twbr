@@ -3,11 +3,12 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Set the LCD I2C address, if it's not working try 0x27.
-double MAX_VOLTAGE = 3.356; // after a bit of calibration on Alec's Arduino
+double MAX_VOLTAGE = 3.3; 
 double R1 = 1000;
 double R2 = 5100;
 int sensorPin = A0;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
+double calibration = 12/11.785; // TODO: set as expected voltage/reported voltage
 
 void setup(){
   // for lcd
@@ -27,7 +28,7 @@ void loop() {
   
   // read the value from the sensor:
   sensorValue = analogRead(sensorPin);
-  double measuredVoltage = (double)sensorValue/4095*MAX_VOLTAGE*(R1+R2)/R1;
+  double measuredVoltage = (double)sensorValue/4095*MAX_VOLTAGE*(R1+R2)/R1*calibration;
   Serial.print(sensorValue);
   Serial.print("   ");
   Serial.println(measuredVoltage);
