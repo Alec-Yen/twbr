@@ -89,7 +89,7 @@ void PID (double& motorPower)
 void* Balance (void* robot_)
 {
 	double motorPower;
-	TWBR* robot = (TWBR *)robot_;
+	RClaw* robot = (RClaw *)robot_;
 
 	I2Cdev::initialize();
 	MPU6050 mpu;
@@ -108,29 +108,18 @@ void* Balance (void* robot_)
 	return NULL;
 }
 
-// move robot forward, backward, or stop
-void* Roam (void* robot_)
+// stop robot upon entering 'q'
+void* Stop (void* robot_)
 {
 	char q;
-	TWBR* robot = (TWBR *)robot_;
+	RClaw* robot = (RClaw *)robot_;
 
 	while (!break_condition) {
-		scanf ("%c",&q);
-		if (q == 'f') { // move forward
-			pthread_mutex_lock (&lock);
-			targetAngle = 2;
-			printf("Moving with target angle %.2f degrees\n",targetAngle);
-			pthread_mutex_unlock (&lock);
-		}
-		else if (q == 'b') { // move backward
-			pthread_mutex_lock (&lock);
-			targetAngle = -2;
-			printf("Moving with target angle %.2f degrees\n",targetAngle);
-			pthread_mutex_unlock (&lock);
-		}
-		else if (q == 'q') { // stop robot
+		scanf("%c",&q);
+		if (q == 'q') {
 			break_condition = true;
 			printf("Breaking out of loop\n");
+	
 			pthread_mutex_lock (&lock);
 			delete robot;
 			pthread_mutex_unlock (&lock);
@@ -140,7 +129,6 @@ void* Roam (void* robot_)
 	return NULL;
 }
 
-// main function
 int main(int argc, char** argv)
 {
 	if (argc != 6) {
@@ -158,7 +146,7 @@ int main(int argc, char** argv)
 	uint8_t address=0x80; //address of roboclaw unit
 	int baudrate=38400;
 	string tty = "/dev/serial0";
-	TWBR *robot = new TWBR (tty, baudrate, address);
+	RClaw *robot = new RClaw (tty, baudrate, address);
 	prev_t = clock();
 	
 	// multithreading
@@ -166,7 +154,7 @@ int main(int argc, char** argv)
 
 	pthread_mutex_init (&lock, NULL);
 	pthread_create (&loop_thread, NULL, Balance, robot);
-	pthread_create (&break_thread, NULL, Roam, robot);
+	pthread_create (&break_thread, NULL, Stop, robot);
 
 	int pterr1 = pthread_join (loop_thread, NULL);
 	int pterr2 = pthread_join (break_thread, NULL);

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	int duty_cycle;
 	int enc1, enc2;
 
-	TWBR *robot = new TWBR (tty, baudrate, address);
+	RClaw *robot = new RClaw (tty, baudrate, address);
 
 	while(1) {
 		printf ("PWM Input: ");

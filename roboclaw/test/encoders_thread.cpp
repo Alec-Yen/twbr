@@ -8,7 +8,7 @@ static bool keepRunning = true;
 
 void* changePWM (void *robot_)
 {
-	TWBR *robot = (TWBR *) robot_;
+	RClaw *robot = (RClaw *) robot_;
 	int duty_cycle;
 	
 	while(keepRunning) {
@@ -30,7 +30,7 @@ void* changePWM (void *robot_)
 
 void* readEncoder (void *robot_)
 {
-	TWBR *robot = (TWBR *) robot_;
+	RClaw *robot = (RClaw *) robot_;
 	int enc1, enc2;
 	while (keepRunning) {
 		robot->readEncoders(enc1,enc2);
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	int baudrate=38400;
 	string tty = "/dev/serial0";
 	
-	TWBR *robot = new TWBR (tty, baudrate, address);
+	RClaw *robot = new RClaw (tty, baudrate, address);
 	pthread_t tid1, tid2;
 
 	// multithreading
