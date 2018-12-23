@@ -32,9 +32,9 @@ make
 sudo make install
 ```
 
-### i2clib-dev - lcd-i2c
+### libi2c-dev - lcd-i2c
 ```
-sudo apt-get install i2clib-dev
+sudo apt-get install libi2c-dev
 ```
 
 
