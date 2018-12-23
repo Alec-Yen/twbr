@@ -24,10 +24,10 @@ $(BIN)/motor: $(OBJ)/motor.o $(OBJ)/PiMotor.o
 	$(CXX) $(LFLAGS) $^ $(LIBS) -o $@ 
 
 $(OBJ)/motor.o: $(TEST)/motor.cpp $(SRC)/PiMotor.cpp $(INC)/PiMotor.h
-	$(CXX) $(CXX_FLAGS) -I$(INC) $< $(LIBS) -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
 $(OBJ)/PiMotor.o: $(SRC)/PiMotor.cpp $(INC)/PiMotor.h
-	$(CXX) $(CXX_FLAGS) -I$(INC) $< $(LIBS) -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
 
 clean:

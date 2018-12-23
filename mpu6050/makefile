@@ -22,10 +22,10 @@ INC_FILES = $(INC)/MPU6050.h $(INC)/I2Cdev.h
 all : $(BIN_FILES)
 
 $(OBJ)/%.o : $(TEST)/%.cpp $(INC_FILES)
-	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< 
 
 $(OBJ)/%.o : $(SRC)/%.cpp $(INC_FILES)
-	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(INC) -o $@ $< 
 
 
 

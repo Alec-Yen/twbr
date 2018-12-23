@@ -48,20 +48,20 @@ $(OBJ)/%.o: $(SRC)/%.cpp $(INC_FILES)
 
 # motor obj
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.cpp $(MOTOR_INC) 
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.cpp $(MOTOR_INC)
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 # imu obj
 $(IMU_DIR)/$(OBJ)/%.o: $(IMU_DIR)/$(SRC)/%.cpp $(IMU_INC)
-	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@
 
 
 

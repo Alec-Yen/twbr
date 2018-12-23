@@ -4,7 +4,7 @@ OBJ = obj
 INC = include
 
 CC = gcc
-CXX = g++ -std=c++11
+CXX = g++ -std=c++98
 DEBUG = -g
 CFLAGS = -Wall -Wextra -c $(DEBUG) -lpthread
 CXX_FLAGS = -Wall -Wextra -c $(DEBUG) -lpthread
@@ -22,14 +22,14 @@ MOTOR_INC = $(MOTOR_DIR)/$(INC)/PiMotor.h
 IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/PiMotor.o
 
-BIN_FILES = $(BIN)/balance $(BIN)/balance_pthread $(BIN)/stop
+BIN_FILES = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/stop
 OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ)
 all: $(BIN_FILES)
 
 
 
 # balance bin
-$(BIN)/balance: $(OBJ)/balance.o $(OBJ_FILES)
+$(BIN)/balance_thread11: $(OBJ)/balance_thread11.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 $(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJ_FILES)
@@ -37,7 +37,6 @@ $(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJ_FILES)
 
 $(BIN)/stop: $(OBJ)/stop.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
-
 
 # balance obj
 $(OBJ)/%.o: $(TEST)/%.cpp
@@ -47,23 +46,28 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 
+# special case that needs c++11
+$(OBJ)/balance_thread11.o: $(SRC)/balance_thread11.cpp
+	g++ -std=c++11 $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
+
+
 
 # motor obj
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.cpp $(MOTOR_INC) 
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.cpp $(MOTOR_INC)
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 # imu obj
 $(IMU_DIR)/$(OBJ)/%.o: $(IMU_DIR)/$(SRC)/%.cpp $(IMU_INC)
-	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@ $(LIBS)
+	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@
 
 
 
