@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 	DEBUG = atoi(argv[5]);
 
 	// initialize everything
-	uint8_t address=0x80; //address of roboclaw unit
+	int address=0x80; //address of roboclaw unit
 	int baudrate=38400;
 	string tty = "/dev/serial0";
 	RClaw *robot = new RClaw (tty, baudrate, address);

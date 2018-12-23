@@ -11,20 +11,29 @@ pthread_mutex_t lock;
 void* changePWM (void *robot_)
 {
 	RClaw *robot = (RClaw *) robot_;
-	int duty_cycle;
+	int status;
+	double duty_cycle, seconds;
 
 	while(keepRunning) {
-		if (scanf("%d",&duty_cycle) == 1) {
+		if (scanf("%lf %lf",&duty_cycle,&seconds) == 2
+				&& duty_cycle < 100 && duty_cycle > -100 && seconds >= 0)
+		{
 			if (duty_cycle == 0) {
 				keepRunning = false;
+				break;
 			}
 
-			if (duty_cycle > 100) duty_cycle = 100;
-			if (duty_cycle < -100) duty_cycle = -100;
-
 			pthread_mutex_lock (&lock);
-			robot->moveSame (duty_cycle,1000); // 1000 milliseconds
+			status = robot->writePWMDuration (duty_cycle,duty_cycle,seconds*1000);
 			pthread_mutex_unlock (&lock);
+
+			if (status != ROBOCLAW_OK) {
+				keepRunning = false;
+				break;
+			}
+		}
+		else {
+			printf("Usage:\n\t<PWM (-100 to 100)> <duration (seconds)>\n\tEnter 0 0 to break\n");
 		}
 	}
 	pthread_mutex_lock (&lock);
@@ -56,7 +65,9 @@ void* readEncoder (void *robot_)
 int main(int argc, char **argv)
 {
 	
-	uint8_t address=0x80; //address of roboclaw unit
+	printf("%s Usage:\n\t<PWM (-100 to 100)> <duration (seconds)>\n\tEnter 0 0 to break\n",argv[0]);
+
+	int address=0x80; //address of roboclaw unit
 	int baudrate=38400;
 	string tty = "/dev/serial0";
 	

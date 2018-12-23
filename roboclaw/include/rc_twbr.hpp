@@ -12,20 +12,20 @@ using namespace std;
 class RClaw {
 	public:
 		// member functions (future-proof)
-		RClaw(string tty_, int baudrate_, uint8_t address_);
+		RClaw(string tty_, int baudrate_, int address_);
 		~RClaw();
-		int writePWM (double pwm1, double pwm2, double ms);
-		void readEncoders (int &enc1, int &enc2);
+		int writePWMDuration (double pwm1, double pwm2, int time_ms);
+		int readEncoders (int &enc1, int &enc2);
 
 		// member functions (to be deprecated)
-		void moveSame (int pwm, double ms); // pwm: -100 to 100, ms: milliseconds
+		int moveSame (double pwm, int ms); // pwm: -100 to 100, ms: milliseconds
 
 	protected:
 		// member variables
 		roboclaw *rc;
 		string tty;
 		int baudrate;
-		uint8_t address;
+		int address;
 };
 
 
