@@ -14,7 +14,7 @@ LIBS = -lpigpio -lrt -l bcm2835 -l m
 
 
 BASEDIR = ..
-IMU_DIR = $(BASEDIR)/mpu6050
+IMU_DIR = $(BASEDIR)/mpu6050_bcm2835
 MOTOR_DIR = $(BASEDIR)/roboclaw
 
 IMU_INC = $(IMU_DIR)/$(INC)/MPU6050.h $(IMU_DIR)/$(INC)/I2Cdev.h

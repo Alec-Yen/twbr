@@ -16,7 +16,7 @@ sudo ./bin/roboclaw-test /dev/serial0 38400 0x80
 Troubleshooting:   
 Raspberry Pi needs a common ground with RoboClaw   
 Perform PID tuning using Basicmicro Motion Studio   
-Reboot Pi
+Reboot Pi  
 Run `sudo ./bin/roboclaw-test /dev/serial0 38400 0x80`
 
 
