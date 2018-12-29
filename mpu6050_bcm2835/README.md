@@ -14,7 +14,7 @@ Dependencies:
 ## Troubleshooting
 
 ## Notes
-See $(BASEDIR)/balance directory for application of imu code.  
+imu_readings.cpp - print accelerometer and gyroscope readings
 https://github.com/jrowberg/i2cdevlib   
 
 

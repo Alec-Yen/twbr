@@ -7,6 +7,7 @@ Dependencies:
 
 
 ## Getting Started  
+To connect to Pi, see wiring/roboclaw images (use RX1 and TX1 on Pi)  
 ```
 make  
 sudo ./bin/roboclaw-test /dev/serial0 38400 0x80
@@ -21,6 +22,9 @@ Run `sudo ./bin/roboclaw-test /dev/serial0 38400 0x80`
 
 
 ## Notes   
-To connect to Pi, see wiring/roboclaw images (use RX1 and TX1 on Pi)  
+roboclaw-test.c - simple test with pwm input to see if roboclaw is operational using roboclaw struct
+encoders.cpp - simple test with pwm input and time duration using RClaw class
+encoders_thread.cpp - multithreading
+encoders_thread_safe.cpp - use mutex and locks
 https://github.com/bmegli/roboclaw   
 
