@@ -2,8 +2,7 @@
 
 ## NOW
 Write code to move forward and turn  
-Use Arduino to measure batt voltage and communicate to Pi  
-Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15  
+Write code to MPU6050 without dependencies  
 
 3D print chassis  
 	Secure IMU so it is as close to aligned as possible  
@@ -16,6 +15,7 @@ Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15
 Physically test balance_pthread code using MDD10A  
 Physically test balance code using Roboclaw  
 Write code to estimate position using Roboclaw encoder count (1920 counts per revolution)  
+Take a look at no-dependency MPU6050 code at http://www.pieter-jan.com/node/15  
 
 
 
