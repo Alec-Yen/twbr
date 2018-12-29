@@ -1,6 +1,6 @@
 #include "rc_twbr.hpp"
 
-// constructor
+// roboclaw constructor
 RClaw::RClaw(string tty_, int baudrate_, int address_)
 {
 	rc = roboclaw_init (tty_.c_str(), baudrate_);
@@ -11,7 +11,7 @@ RClaw::RClaw(string tty_, int baudrate_, int address_)
 	address = address_;
 }
 
-// destructor
+// our roboclaw destructor
 RClaw::~RClaw()
 {
 	moveSame (0,1000); // stop the motors
@@ -20,7 +20,7 @@ RClaw::~RClaw()
 	else printf("Shutdown roboclaw successfully\n");
 }
 
-// if time_ms equals -1, indefinite
+// write PWM to motors 1 and 2
 int RClaw::writePWMDuration (double pwm1, double pwm2, int time_ms)
 {
 	int status;
@@ -30,8 +30,8 @@ int RClaw::writePWMDuration (double pwm1, double pwm2, int time_ms)
 	// error handling
 	if (pwm1>100 || pwm1<-100 || pwm2>100 || pwm2<-100)
 		fprintf(stderr,"writePWMDuration Usage:\n set pwm as duty cycle from -100 to 100\n");
-	if (!(time_ms == -1 || time_ms > 0))
-		fprintf(stderr,"writePWMDuration Usage:\nset set time_ms in milliseconds, set to -1 for indefinite\n");
+	if (!(time_ms > 0))
+		fprintf(stderr,"writePWMDuration Usage:\nset set time_ms in milliseconds\n");
 
 	// set duty cycle
 	status = roboclaw_duty_m1m2 (rc, address, duty_cycle1, duty_cycle2);
@@ -39,14 +39,13 @@ int RClaw::writePWMDuration (double pwm1, double pwm2, int time_ms)
 		fprintf(stderr,"roboclaw_duty_m1m2 Error:\nProblem communicating with roboclaw, terminating\n");
 	
 	// stop if definite time duration
-	if (time_ms != -1) {
-		usleep (time_ms*1000);
-		roboclaw_duty_m1m2 (rc, address, 0, 0);
-	}
+	usleep (time_ms*1000);
+	roboclaw_duty_m1m2 (rc, address, 0, 0);
 	return status;
 }
 
 
+// read encoders 1 and 2 count
 int RClaw::readEncoders (int &enc1, int &enc2)
 {
 	int status;
@@ -60,7 +59,9 @@ int RClaw::readEncoders (int &enc1, int &enc2)
 
 
 
-// to be deprecated
+/******************* TO BE DEPRECATED ***********************/
+
+// move same, to match mdd10a moveSame method
 int RClaw::moveSame (double pwm, int ms)
 {
 	int status;

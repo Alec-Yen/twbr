@@ -22,5 +22,5 @@ Run `sudo ./bin/roboclaw-test /dev/serial0 38400 0x80`
 
 Notes:   
 To connect to Pi, see wiring/roboclaw images (use RX1 and TX1 on Pi)  
-C Code: https://github.com/bmegli/roboclaw   
+Cpp Code: https://github.com/bmegli/roboclaw   
 
