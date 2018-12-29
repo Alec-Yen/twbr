@@ -2,7 +2,7 @@
 
 
 ## INSTALLED LIBRARIES (OK)
-libi2c-dev // for mpu6060_nd, extra/lcd-i2c  
+libi2c-dev // for mpu6060_i2c, extra/lcd-i2c  
 
 
 ## INSTALLED LIBRARIES (NOT OK)

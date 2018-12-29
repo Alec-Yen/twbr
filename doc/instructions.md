@@ -4,17 +4,9 @@ Following is how to install dependencies that are not by default installed on a 
 
 ## REQUIRED
 
-### bcm2835 - mpu6050_bcm2835
-
+### libi2c-dev - mpu6050_i2c, lcd-i2c
 ```
-cd
-wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.58.tar.gz
-tar zxvf bcm2835-1.58.tar.gz
-cd bcm2835-1.58
-./configure
-make
-sudo make check
-sudo make install
+sudo apt-get install libi2c-dev
 ```
 
 ## OPTIONAL
@@ -32,10 +24,20 @@ make
 sudo make install
 ```
 
-### libi2c-dev - lcd-i2c
+### bcm2835 - mpu6050_bcm2835
+
 ```
-sudo apt-get install libi2c-dev
+cd
+wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.58.tar.gz
+tar zxvf bcm2835-1.58.tar.gz
+cd bcm2835-1.58
+./configure
+make
+sudo make check
+sudo make install
 ```
+
+
 
 
 ### wiringPi - not actually required for anything (is analogous to pigpio)
