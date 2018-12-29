@@ -4,7 +4,7 @@ Following is how to install dependencies that are not by default installed on a 
 
 ## REQUIRED
 
-### bcm2835 - mpu6050
+### bcm2835 - mpu6050_bcm2835
 
 ```
 cd
