@@ -1,1 +1,22 @@
-Simple userspace C application that uses i2c-dev driver to read accelerometer, gyro, and temperature data from a mpu-6050 sensor.
+# MPU6050 Inertial Measurement Unit
+
+Overview:  
+This repository includes code to operate MPU6050 IMU using Pi, without dependencies. Uses i2c-dev driver.  
+Libraries:   
+Dependencies:   
+
+
+Getting Started:  
+```
+make  
+sudo ./bin/rpi-mpu6050
+```
+
+
+Troubleshooting:   
+
+
+Notes:   
+To connect to Pi, see wiring  
+C Code: https://github.com/rndrwz/rpi-mpu6050 
+
