@@ -11,7 +11,7 @@ RClaw::RClaw(string tty_, int baudrate_, int address_)
 	address = address_;
 }
 
-// our roboclaw destructor
+// roboclaw destructor
 RClaw::~RClaw()
 {
 	moveSame (0,1000); // stop the motors

@@ -1,18 +1,20 @@
 # MPU6050 Inertial Measurement Unit
 
-Overview:  
+## Overview  
 This repository includes code to operate MPU6050 using bcm2835 library.  
 Libraries: bcm2835  
 Dependencies:  
 
 
-Getting Started:   
+## Getting Started   
 1. Install bcm2835 library http://www.airspayce.com/mikem/bcm2835/index.html   
 2. Enable I2C and connect IMU (see pinout in wiring)   
 3. Use the included makefile
 
+## Troubleshooting
 
+## Notes
 See $(BASEDIR)/balance directory for application of imu code.  
-Cpp Code: https://github.com/jrowberg/i2cdevlib   
+https://github.com/jrowberg/i2cdevlib   
 
 

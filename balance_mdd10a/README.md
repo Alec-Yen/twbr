@@ -1,17 +1,18 @@
 # Balancing with MDD10A
 
-Overview:  
+## Overview  
 This repository includes code to balance using MDD10A motor driver and MPU6050 IMU. This is an older repo that we are moving away from.  
 Libraries: bcm2835, pigpio  
 Dependencies: $(BASEDIR)/mdd10a, $(BASEDIR)/mpu6050  
 
 
-Getting Started:  
+## Getting Started  
 Run the makefile, and execute `sudo ./bin/balance 60 .5 .5 0 0`   
 To stop, type "q" and press ENTER
 
+## Troubleshooting
 
-Notes:   
-balance_no_thread.cpp does not handle interrupts, is old code   
-balance.cpp uses c++11 threading, will be replaced  
-balance_pthread.cpp uses c++98 threading, is the future
+## Notes   
+balance_no_thread.cpp - does not handle interrupts, is old code   
+balance.cpp - uses c++11 threading, will be replaced  
+balance_pthread.cpp - uses c++98 threading, is the future
