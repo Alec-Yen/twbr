@@ -1,18 +1,20 @@
 #!/bin/bash
 
+# :5,16s/\([0-9]\+\.\)/\\n\1/g
+
 if [ $# = 0 ]
 then
-	printf '1. CHANGE DIRECTORY to balance_mdd10a\n' && \
+	printf '\n1. CHANGE DIRECTORY to balance_mdd10a\n' && \
 	cd balance_mdd10a && make && \
-	printf '2. CHANGE DIRECTORY to balance_roboclaw\n' && \
+	printf '\n2. CHANGE DIRECTORY to balance_roboclaw\n' && \
 	cd ../balance_roboclaw && make && \
-	printf '3. CHANGE DIRECTORY to mpu6050_bcm2835\n' && \
+	printf '\n3. CHANGE DIRECTORY to mpu6050_bcm2835\n' && \
 	cd ../mpu6050_bcm2835 && make && \
-	printf '4. CHANGE DIRECTORY to mpu6050_i2c\n' && \
+	printf '\n4. CHANGE DIRECTORY to mpu6050_i2c\n' && \
 	cd ../mpu6050_i2c && make && \
-	printf '5. CHANGE DIRECTORY to mdd10a\n' && \
+	printf '\n5. CHANGE DIRECTORY to mdd10a\n' && \
 	cd ../mdd10a && make && \
-	printf '6. CHANGE DIRECTORY to roboclaw\n' && \
+	printf '\n6. CHANGE DIRECTORY to roboclaw\n' && \
 	cd ../roboclaw && make
 elif [ "$1" = "clean" ]
 then
