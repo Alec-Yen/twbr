@@ -39,7 +39,7 @@ int main()
 		prevAngle = currentAngle;
 
 		count++;
-		if (count%100==0) printf ("accX=%10.2f accY=%10.2f accZ=%10.2f gyroX=%10.2f gyroY=%10.2f gyroZ=%10.2f accAngle=%10.2f currentAngle=%10.2f\n", accX, accY, accZ, gyroX, gyroY, gyroZ, accAngle, currentAngle); 
+		if (count%100==0) printf ("accX=%10.2f accY=%10.2f accZ=%10.2f gyroX=%10.2f gyroY=%10.2f gyroZ=%10.2f accAngle=%10.2f gyroAngle=%10.2f currentAngle=%10.2f\n", accX, accY, accZ, gyroX, gyroY, gyroZ, accAngle, gyroAngle, currentAngle); 
 
 		sleep(sampleTime);
 	}
