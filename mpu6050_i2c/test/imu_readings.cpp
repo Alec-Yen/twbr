@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <time.h>
 #include "MPU6050.h"
+#include "I2Cdev.h"
 
 using namespace std;
 
@@ -17,9 +18,11 @@ double sampleTime = 0.01;
 
 int main()
 {
+	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
+	int count = 0;
 	while (1) {
 		double accX = mpu.getAccelerationX()/16384.0;
 		double accY = mpu.getAccelerationY()/16384.0;
@@ -33,10 +36,12 @@ int main()
 		double gyroRate = gyroX; // degrees/second
 		double gyroAngle = gyroRate*sampleTime; // degrees
 		double currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*accAngle; // complementary filter
+		prevAngle = currentAngle;
 
-		printf ("accX=%4.2f accY=%4.2f accZ=%4.2f gyroX=%4.2f gyroY=%4.2f gyroZ=%4.2f currentAngle=%4.2f\n", accX, accY, accZ, gyroX, gyroY, gyroZ, currentAngle); 
+		count++;
+		if (count%100==0) printf ("accX=%10.2f accY=%10.2f accZ=%10.2f gyroX=%10.2f gyroY=%10.2f gyroZ=%10.2f accAngle=%10.2f currentAngle=%10.2f\n", accX, accY, accZ, gyroX, gyroY, gyroZ, accAngle, currentAngle); 
 
-		sleep(1);
+		sleep(sampleTime);
 	}
 
 	return 0;
