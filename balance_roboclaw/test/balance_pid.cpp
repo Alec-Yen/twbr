@@ -8,6 +8,7 @@
 #include "rc_twbr.hpp"
 #include "MPU6050.h"
 #include "I2Cdev.h"
+#include "pid.h"
 
 using namespace std;
 
@@ -16,13 +17,12 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 40; // TODO: this value is going to be lower using roboclaw since it is out of 100
+int MAX_MOTOR = 60; // TODO: this value is going to be lower using roboclaw since it is out of 100
 int count = 0; // TODO: don't want to have to include
 
 // for PID method
 double Kp, Kd, Ki;  // PID coefficients
 double accY, accZ, gyroX; // IMU measurements
-double iTerm = 0;
 double prevAngle = 0;
 clock_t prev_t;
 double motorTime = 0.01; // seconds
@@ -32,10 +32,13 @@ pthread_mutex_t lock; // for thread safe code
 bool break_condition = false;
 
 
+
+
+
 // calculate motor PWM from PID equation
-void PID (double& motorPower)
+void PID (SPid *spid, double& motorPower)
 {
-	double err,gyroRate,changeInAngle,pTerm,dTerm;
+	double err,gyroRate;
 	double accAngle, gyroAngle, currentAngle;
 	double sampleTime;
 	
@@ -57,12 +60,12 @@ void PID (double& motorPower)
 	pthread_mutex_lock (&lock);
 	err = currentAngle - targetAngle; // targetAngle is 0
 	pthread_mutex_unlock (&lock);
-	changeInAngle = currentAngle - prevAngle;
-	pTerm = Kp*err;
-	iTerm += Ki*err;
-	dTerm = Kd*changeInAngle;
+//	changeInAngle = currentAngle - prevAngle;
+//	pTerm = Kp*err;
+//	iTerm += Ki*err*sampleTime;
+//	dTerm = Kd*changeInAngle/sampleTime;
 
-	motorPower = pTerm + iTerm + dTerm;
+	motorPower = spid->UpdatePID(err, currentAngle);
 	prevAngle = currentAngle;
 
 	// keep within max power
@@ -96,11 +99,20 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
+	SPid* spid = new SPid;
+	spid->derState = 0;
+	spid->integratState = 0;
+	spid->integratMax = 10;
+	spid->integratMin = -spid->integratMax;
+	spid->integratGain = Ki;
+	spid->propGain = Kp;
+	spid->derGain = Kd;
+
 	while(!break_condition) {
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
-		PID(motorPower);
+		PID(spid, motorPower);
 
 		pthread_mutex_lock (&lock);
 		robot->moveSame(motorPower,motorTime*1000); // third argument is in milliseconds
