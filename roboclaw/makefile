@@ -7,9 +7,9 @@ TEST = test
 CC = gcc
 CXX = g++ -std=c++98
 DEBUG = -g
-CFLAGS = -O3 -Wall -c $(DEBUG) -lpthread
-CXX_FLAGS = -O3 -Wall -c $(DEBUG) -lpthread
-LFLAGS = -O3 -Wall $(DEBUG) -lpthread
+CFLAGS = -O3 -Wall -c $(DEBUG) -pthread
+CXX_FLAGS = -O3 -Wall -c $(DEBUG) -pthread
+LFLAGS = -O3 -Wall $(DEBUG) -pthread
 
 BIN_FILES = $(BIN)/encoders $(BIN)/encoders_thread $(BIN)/encoders_thread_safe $(BIN)/roboclaw-test
 INC_FILES = $(INC)/roboclaw.h $(INC)/rc_twbr.hpp

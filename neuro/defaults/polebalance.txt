@@ -1,0 +1,62 @@
+{
+######## Simulation Parameters ########
+
+    max_sim_time_timesteps: 15000,
+    test_cases_files: tests/eo-single.txt,
+
+    max_x: 2.4,
+    max_xd: 2,
+    max_theta: 0.209,
+    max_thetad: 2,
+
+
+######## Neuromorphic Parameters ########
+
+    run_time: 100,
+    force_levels: 1,
+    output_type: INTEGER,
+
+######## PBNP and PBNRun Parameters ########
+
+    print_all_states: FALSE,
+    host_ap: localhost,
+
+
+######## Game Player Parameters ########
+
+    port_ap: 0,
+    port_viz: 0,
+
+    ap_realtime: FALSE,
+    ap_stdout: TRUE,
+    # ap_output_file: "ap_output.txt",
+
+
+
+######## PBEO Parameters ########
+
+    fitness_factor_survival: 1,
+    fitness_factor_stability: 0,
+    stability_tracking_time: 100,
+    stability_penalize_movement: FALSE,
+
+    ver_start_x: -2.2,
+    ver_end_x:    2.2,
+    ver_diff_x:   0.4,
+
+    ver_start_theta: -0.18,
+    ver_end_theta:    0.18,
+    ver_diff_theta:   0.04,
+
+######## PBData Parameters ########
+
+    data_output_file: "data.csv",
+
+    start_x: -2.3,
+    end_x:    2.3,
+    diff_x:   0.1,
+
+    start_theta: -0.20,
+    end_theta:    0.20,
+    diff_theta:   0.01,
+}

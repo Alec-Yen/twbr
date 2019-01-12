@@ -24,13 +24,16 @@ IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/roboclaw.o $(MOTOR_DIR)/$(OBJ)/rc_twbr.o
 
 INC_FILES = $(INC)/twbr.h $(INC)/pid.h
-BIN_FILES = $(BIN)/balance $(BIN)/balance_pid $(BIN)/roam
+BIN_FILES = $(BIN)/balance_2 $(BIN)/balance $(BIN)/balance_pid $(BIN)/roam
 OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ) $(OBJ)/twbr.o $(OBJ)/pid.o
 all: $(BIN_FILES)
 
 
 
 # balance bin
+$(BIN)/balance_2: $(OBJ)/balance_2.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
 $(BIN)/balance: $(OBJ)/balance.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
