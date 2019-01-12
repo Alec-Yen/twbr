@@ -7,7 +7,6 @@
 #include <pthread.h>
 #include <time.h>
 #include "MPU6050.h"
-#include "I2Cdev.h"
 
 using namespace std;
 
@@ -18,7 +17,6 @@ double sampleTime = 0.01;
 
 int main()
 {
-	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
