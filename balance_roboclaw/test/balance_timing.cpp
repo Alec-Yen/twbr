@@ -1,14 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <unistd.h>
-#include <signal.h>
-#include <pthread.h>
-#include <sys/time.h>
+#include <pthread.h> // for threading
 #include "rc_twbr.hpp"
 #include "MPU6050.h"
 #include "I2Cdev.h"
 #include "twbr.h"
+#include "timing.h"
 
 using namespace std;
 
@@ -17,11 +15,11 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 40; // TODO: this value is going to be lower using roboclaw since it is out of 100
-int count = 0; // TODO: don't want to have to include
+int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value 
 
 // for timing
-int STD_LOOP_TIME = 9;            
+double sampleTime = 0.01; // in seconds
+int STD_LOOP_TIME = 9; // in milliseconds TODO: understand why this causes loops every 10 milliseconds           
 int lastLoopTime = STD_LOOP_TIME;
 int lastLoopUsefulTime = STD_LOOP_TIME;
 unsigned long loopStartTime = 0;
@@ -32,19 +30,10 @@ double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
 clock_t prev_t;
-double sampleTime = 0.01;
 
 // multithreading shared variables
 pthread_mutex_t lock; // for thread safe code
 bool break_condition = false;
-
-// millis function
-int millis ()
-{
-	struct timeval start;
-	gettimeofday(&start, NULL);
-	return (int)start.tv_usec/1000.0;
-}
 
 
 // calculate motor PWM from PID equation
@@ -104,22 +93,24 @@ void* Balance (void* robot_)
 	mpu.initialize();
 
 	while(!break_condition) {
+
+		// balance code
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
 		PID(motorPower);
 
-		//		pthread_mutex_lock (&lock);
+		pthread_mutex_lock (&lock);
 		robot->writePWM(motorPower,motorPower);
-		//		pthread_mutex_unlock (&lock);
+		pthread_mutex_unlock (&lock);
 
-		// calculate timing (TODO: calculations not working)
+
+		// code to make sure loop executes with precise timing
+		printf("lastLoopUsefulTime=%10d loopStartTime=%10lu lastLoopTime=%10d\n",lastLoopUsefulTime,loopStartTime,lastLoopTime);
 		lastLoopUsefulTime = millis()-loopStartTime;
-		if(lastLoopUsefulTime<STD_LOOP_TIME)			usleep((STD_LOOP_TIME-lastLoopUsefulTime)*1000);
+		if(lastLoopUsefulTime<STD_LOOP_TIME)			delay(STD_LOOP_TIME-lastLoopUsefulTime);
 		lastLoopTime = millis() - loopStartTime;
 		loopStartTime = millis();
-
-
 	}
 	return NULL;
 }
