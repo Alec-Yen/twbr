@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# :5,16s/\([0-9]\+\.\)/\\n\1/g
+
+if [ $# = 0 ]
+then
+	printf '\n1. CHANGE DIRECTORY to balance_mdd10a\n' && \
+	cd balance_mdd10a && make && \
+	printf '\n2. CHANGE DIRECTORY to balance_roboclaw\n' && \
+	cd ../balance_roboclaw && make && \
+	printf '\n3. CHANGE DIRECTORY to mpu6050_bcm2835\n' && \
+	cd ../mpu6050_bcm2835 && make && \
+	printf '\n4. CHANGE DIRECTORY to mpu6050_i2c\n' && \
+	cd ../mpu6050_i2c && make && \
+	printf '\n5. CHANGE DIRECTORY to mdd10a\n' && \
+	cd ../mdd10a && make && \
+	printf '\n6. CHANGE DIRECTORY to roboclaw\n' && \
+	cd ../roboclaw && make
+elif [ "$1" = "clean" ]
+then
+	cd balance_mdd10a && make clean && \
+	cd ../balance_roboclaw && make clean && \
+	cd ../mpu6050_bcm2835 && make clean && \
+	cd ../mpu6050_i2c && make clean && \
+	cd ../mdd10a && make clean && \
+	cd ../roboclaw && make clean
+else
+	printf "usage: \n\tto make all: ./build\n\tto make clean all: ./build clean\n"
+fi
