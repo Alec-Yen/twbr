@@ -15,21 +15,20 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value 
+int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value, might be 100 
 
 // for timing
-double sampleTime = 0.01; // in seconds
-int STD_LOOP_TIME = 9; // in milliseconds TODO: understand why this causes loops every 10 milliseconds           
+double sampleTime = 0.01; // in seconds, or 10 milliseconds
+int STD_LOOP_TIME = 10; // in milliseconds TODO: Kas does 9 for some reason           
 int lastLoopTime = STD_LOOP_TIME;
 int lastLoopUsefulTime = STD_LOOP_TIME;
-unsigned long loopStartTime = 0;
+unsigned long loopStartTime;
 
 // for PID method
 double Kp, Kd, Ki;  // PID coefficients
 double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
-clock_t prev_t;
 
 // multithreading shared variables
 pthread_mutex_t lock; // for thread safe code
@@ -92,6 +91,7 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
+	loopStartTime = millis();
 	while(!break_condition) {
 
 		// balance code
@@ -154,7 +154,6 @@ int main(int argc, char** argv)
 	int baudrate=38400;
 	string tty = "/dev/serial0";
 	RClaw *robot = new RClaw (tty, baudrate, address);
-	prev_t = clock();
 
 	// multithreading
 	pthread_t loop_thread, break_thread;
@@ -170,4 +169,5 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
 

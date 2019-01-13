@@ -25,7 +25,7 @@ IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/roboclaw.o $(MOTOR_DIR)/$(OBJ)/rc_twbr.o
 
 INC_FILES = $(INC)/twbr.h $(INC)/pid.h 
-BIN_FILES = $(BIN)/timing $(BIN)/balance_timing $(BIN)/balance $(BIN)/balance_pid $(BIN)/roam
+BIN_FILES = $(BIN)/timing $(BIN)/balance_timing $(BIN)/balance_timing_calibrate $(BIN)/balance $(BIN)/balance_pid $(BIN)/roam
 OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ) $(OBJ)/twbr.o $(OBJ)/pid.o
 all: $(BIN_FILES)
 
@@ -33,6 +33,9 @@ all: $(BIN_FILES)
 
 # balance bin
 $(BIN)/timing: $(OBJ)/timing.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+$(BIN)/balance_timing_calibrate: $(OBJ)/balance_timing_calibrate.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 $(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJ_FILES)
