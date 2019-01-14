@@ -80,8 +80,8 @@ void PID (double& motorPower)
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
 	gyroAngle = gyroRate*sampleTime; // degrees
-	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
-
+//	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
+	currentAngle = kalmanCalculate(accAngle, gyroRate, lastLoopTime);
 	// PID calculations
 	pthread_mutex_lock (&lock);
 	err = currentAngle - targetAngle; // targetAngle is 0
