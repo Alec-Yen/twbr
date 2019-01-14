@@ -10,6 +10,7 @@
 #include "PiMotor.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"
+#include "timing.h"
 
 using namespace std;
 
@@ -31,6 +32,19 @@ double iTerm = 0;
 double prevAngle = 0;
 clock_t prev_t;
 double motorTime = 0.01; // seconds
+
+// for timing
+double sampleTime = 0.01; // in seconds
+int STD_LOOP_TIME = 10; // in milliseconds TODO: in forum, Kas made this 9 but that doesn't make sense? 
+int lastLoopTime = STD_LOOP_TIME;
+int lastLoopUsefulTime = STD_LOOP_TIME;
+unsigned long loopStartTime;
+
+
+// for IMU calibration
+enum IMU_Index {ACC_Y,ACC_Z,GYRO_X};
+int sensorZero[3] = {0,0,0}; // calibration
+int sensorValue[3] = {0,0,0}; // averaged raw IMU measurements
 
 
 // multithreading shared variables
@@ -103,6 +117,7 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
+	loopStartTime = millis();
 	while(!break_condition) {
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
@@ -110,8 +125,17 @@ void* Balance (void* robot_)
 		PID(motorPower,direction);
 
 		pthread_mutex_lock (&lock);
-		robot->moveSame(direction,motorPower,motorTime*1000); // third argument is in milliseconds
+		robot->writePWMSame(direction,motorPower);
+		//		robot->moveSame(direction,motorPower,motorTime*1000); // third argument is in milliseconds
 		pthread_mutex_unlock (&lock);
+
+		// code to make sure loop executes with precise timing
+		//printf("lastLoopUsefulTime=%10d loopStartTime=%10lu lastLoopTime=%10d\n",lastLoopUsefulTime,loopStartTime,lastLoopTime);
+		lastLoopUsefulTime = millis()-loopStartTime;
+		if(lastLoopUsefulTime<STD_LOOP_TIME)			delay(STD_LOOP_TIME-lastLoopUsefulTime);
+		lastLoopTime = millis() - loopStartTime;
+		loopStartTime = millis();
+
 	}
 	return NULL;
 }
