@@ -66,8 +66,8 @@ void PID (double& motorPower)
 	pthread_mutex_unlock (&lock);
 
 	pTerm = Kp*err;
-	iTerm += Ki*err; // don't need to account for time if time is set
-	dTerm = Kd*(currentAngle - prevAngle);
+	iTerm += Ki*err*sampleTime; // TODO: don't need to account for time if time is set
+	dTerm = Kd*(currentAngle - prevAngle)/sampleTime;
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
 
