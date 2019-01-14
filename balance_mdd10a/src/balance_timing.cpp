@@ -23,7 +23,7 @@ int p2 = 12; //Right PWM
 int d2 = 16; //Right DIR
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 100;
+int MAX_MOTOR = 200; // max is 255
 
 // for PID method
 double Kp, Kd, Ki; // PID coefficients 
@@ -31,15 +31,13 @@ double accY, accZ, gyroX; // IMU measurements
 double iTerm = 0;
 double prevAngle = 0;
 clock_t prev_t;
-double motorTime = 0.01; // seconds
 
 // for timing
-double sampleTime = 0.01; // in seconds
 int STD_LOOP_TIME = 10; // in milliseconds TODO: in forum, Kas made this 9 but that doesn't make sense? 
 int lastLoopTime = STD_LOOP_TIME;
 int lastLoopUsefulTime = STD_LOOP_TIME;
 unsigned long loopStartTime;
-
+double sampleTime = STD_LOOP_TIME/1000.0; // in seconds
 
 // for IMU calibration
 enum IMU_Index {ACC_Y,ACC_Z,GYRO_X};
@@ -57,15 +55,7 @@ void PID (double& motorPower, int& direction)
 {
 	double err,gyroRate,changeInAngle,pTerm,dTerm;
 	double accAngle, gyroAngle, currentAngle;
-	double sampleTime;
 	
-	// calculate sampleTime (TODO: calculations not working)
-	sampleTime = 0.01;
-	//clock_t curr_t = clock();
-	//sampleTime = (double)(curr_t-prev_t)/CLOCKS_PER_SEC;
-	//prev_t = curr_t;
-
-
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
@@ -96,8 +86,7 @@ void PID (double& motorPower, int& direction)
 	else direction = 1;
 
 	// print statements
-	if (PRINT) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
-	if (PRINT) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
+	if (PRINT) printf("accAngle %3.2f\t gyroAngle %3.6f\t\t currentAngle %3.2f\t pTerm %3.2f\t dTerm %3.2f\t motorPower = %3.2f\n",accAngle,gyroAngle,currentAngle,pTerm,dTerm,motorPower);
 
 	// debug for testing without running motors
 	if (DEBUG) {
@@ -117,20 +106,51 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
+	delay(100);
+
+	for (int n=0; n<50; n++) {
+		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
+		sensorZero[ACC_Y] += mpu.getAccelerationY();
+		sensorZero[ACC_Z] += mpu.getAccelerationZ();
+		sensorZero[GYRO_X] += mpu.getRotationX();
+	}
+	for (int i=0; i<3; i++) sensorZero[i] /= 50;
+	sensorZero[ACC_Z] -= 16384; 
+
+	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
+	int AVERAGE_TIMES = 5; // number of values averaged together
+
+
+
+	// balancing loop
 	loopStartTime = millis();
 	while(!break_condition) {
+
+		// read IMU values TODO: see if this works
+		for (int i=0; i<3; i++) sensorValue[i] = 0;
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[ACC_Y] += mpu.getAccelerationY();
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[ACC_Z] += mpu.getAccelerationZ();
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[GYRO_X] += mpu.getRotationX();
+		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/AVERAGE_TIMES - sensorZero[i];
+	
+
+		accY = sensorValue[ACC_Y]/16384.0;
+		accZ = sensorValue[ACC_Z]/16384.0;
+		gyroX = sensorValue[GYRO_X]/131.0;
+
 		accY = mpu.getAccelerationY()/16384.0;
 		accZ = mpu.getAccelerationZ()/16384.0;
 		gyroX = mpu.getRotationX()/131.0;
+
 		PID(motorPower,direction);
 
 		pthread_mutex_lock (&lock);
 		robot->writePWMSame(direction,motorPower);
-		//		robot->moveSame(direction,motorPower,motorTime*1000); // third argument is in milliseconds
+		//robot->moveSame(direction,motorPower,sampleTime*1000); // third argument is in milliseconds
 		pthread_mutex_unlock (&lock);
 
 		// code to make sure loop executes with precise timing
-		//printf("lastLoopUsefulTime=%10d loopStartTime=%10lu lastLoopTime=%10d\n",lastLoopUsefulTime,loopStartTime,lastLoopTime);
+		//printf("lastLoopUsefulTime=%10d lastLoopTime=%10d\n",lastLoopUsefulTime,lastLoopTime);
 		lastLoopUsefulTime = millis()-loopStartTime;
 		if(lastLoopUsefulTime<STD_LOOP_TIME)			delay(STD_LOOP_TIME-lastLoopUsefulTime);
 		lastLoopTime = millis() - loopStartTime;
@@ -152,8 +172,9 @@ void* Stop (void* robot_)
 		printf("Breaking out of loop\n");
 
 		pthread_mutex_lock (&lock);
-		robot->wait(1000);
-		robot->stop(); // also calls gpioTerminate()
+		robot->wait(100);
+//		robot->stop(); // also calls gpioTerminate()
+		robot->writePWMSame(1,0);
 		pthread_mutex_unlock (&lock);
 	}
 	return NULL;
@@ -163,14 +184,16 @@ void* Stop (void* robot_)
 int main(int argc, char** argv)
 {
 	// check command line arguments
-	if (argc != 4) {
-		fprintf(stderr,"usage: sudo %s Kp Ki Kd\n",argv[0]);
-		fprintf(stderr,"\tsudo %s 60 .5 .5\n",argv[0]);
+	if (argc != 6) {
+		fprintf(stderr,"usage: sudo %s Kp Ki Kd PRINT DEBUG\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 60 .5 .5 0 0\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);
 	Ki = atof(argv[2]);
 	Kd = atof(argv[3]);
+	PRINT = atoi(argv[4]);
+	DEBUG = atoi(argv[5]);
 
 	// initialize everything
 	TWBR *robot = new TWBR(p1,d1,p2,d2);
@@ -185,6 +208,7 @@ int main(int argc, char** argv)
 	pthread_join (loop_thread, NULL);
 	pthread_join (break_thread, NULL);
 	printf("Threads joined successfully\n");
+	robot->writePWMSame(1,0);
 
 	return 0;
 }

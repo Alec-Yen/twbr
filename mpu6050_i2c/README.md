@@ -1,7 +1,7 @@
 # MPU6050 Inertial Measurement Unit
 
 ## Overview  
-This repository includes code to operate MPU6050 IMU using Pi, using libi2c-dev driver.  
+This repository includes code to operate MPU6050 IMU using Pi, using libi2c-dev driver. Is not currently working.  
 Libraries: libi2c-dev   
 Dependencies:   
 
