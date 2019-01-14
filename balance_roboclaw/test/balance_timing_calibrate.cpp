@@ -15,7 +15,7 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 100; // out of 100, TODO: trying to figure out optimal value, maybe should just be 100
+int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value, maybe should just be 100
 
 // for timing
 double sampleTime = 0.01; // in seconds
@@ -26,9 +26,9 @@ unsigned long loopStartTime;
 
 
 // for IMU calibration
-enum IMU_Index {ACC_X,ACC_Y,ACC_Z,GYRO_X,GYRO_Y,GYRO_Z};
-int sensorZero[] = {0,0,0,0,0,0}; // calibration
-int sensorValue[] = {0,0,0,0,0,0}; // averaged raw IMU measurements
+enum IMU_Index {ACC_Y,ACC_Z,GYRO_X};
+int sensorZero[3] = {0,0,0}; // calibration
+int sensorValue[3] = {0,0,0}; // averaged raw IMU measurements
 
 
 // for PID method
@@ -41,6 +41,8 @@ double prevAngle = 0;
 pthread_mutex_t lock; // for thread safe code
 bool break_condition = false;
 
+// for printing
+static int skip = 0;
 
 /*************************************************************************************************************/
 
@@ -65,6 +67,7 @@ void PID (double& motorPower)
 	err = currentAngle - targetAngle;
 	pthread_mutex_unlock (&lock);
 
+
 	pTerm = Kp*err;
 	iTerm += Ki*err; // TODO: don't need to account for time if time is set
 	dTerm = Kd*(currentAngle - prevAngle);
@@ -80,8 +83,11 @@ void PID (double& motorPower)
 	motorPower *= -1;
 
 	// print statements
-	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
+	if (PRINT_ANGLE && skip++==5) {
+		skip = 0;
+		printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\t\t motorPower %.2f\n",accAngle,gyroAngle,currentAngle,motorPower);
 	//	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
+	}
 
 	// debug for testing without running motors
 	if (DEBUG) {
@@ -102,15 +108,20 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
+	delay(100);
 
 	// calibrate sensor TODO: see if this works
-	int16_t sensorTemp[6];
 	for (int n=0; n<50; n++) {
-		mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
-		for (int i=0; i<6; i++) sensorZero[i] += sensorTemp[i];
+		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
+		sensorZero[ACC_Y] += mpu.getAccelerationY();
+		sensorZero[ACC_Z] += mpu.getAccelerationZ();
+		sensorZero[GYRO_X] += mpu.getRotationX();
 	}
-	for (int i=0; i<6; i++) sensorZero[i] /= 50;
-	sensorZero[ACC_Z] -= 0; //TODO: figure out what value to put here (Kas uses 102)
+	for (int i=0; i<3; i++) sensorZero[i] /= 50;
+	sensorZero[ACC_Z] -= 16384; //TODO: figure out what value to put here (Kas uses 102)
+
+	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
+
 
 
 
@@ -119,17 +130,28 @@ void* Balance (void* robot_)
 	while(!break_condition) {
 
 		// read IMU values TODO: see if this works
-		for (int i=0; i<6; i++) sensorValue[i] = 0;
+		for (int i=0; i<3; i++) sensorValue[i] = 0;
 		for (int n=0; n<5; n++) {
-			mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
-			for (int i=0; i<6; i++) sensorValue[i] += sensorTemp[i];
+			sensorValue[ACC_Y] += mpu.getAccelerationY();
+			sensorValue[ACC_Z] += mpu.getAccelerationZ();
+			sensorValue[GYRO_X] += mpu.getRotationX();
 		}
-		for (int i=0; i<6; i++) sensorValue[i] = sensorValue[i]/5 - sensorZero[i];
-		
+		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/5 - sensorZero[i];
+	
 		// convert IMU values
 		accY = sensorValue[ACC_Y]/16384.0;
 		accZ = sensorValue[ACC_Z]/16384.0;
 		gyroX = sensorValue[GYRO_X]/131.0;
+
+
+		if (skip++==5) {
+			skip = 0;
+			//	printf("sensorValue[ACC_Z]=%10d\tsensorValue[ACC_Y]=%10d\tsensorValue[GYRO_X]=%10d\n",sensorValue[ACC_Z],sensorValue[ACC_Y],sensorValue[GYRO_X]);
+			//	printf("accY=%10.2f\taccZ=%10.2f\tgyroX=%10.2f\n",accY,accZ,gyroX);
+			//	printf("lastLoopUsefulTime=%10d, lastLoopTime=%10d\n",lastLoopUsefulTime,lastLoopTime);
+		}
+
+
 		PID(motorPower);
 
 		// drive motor

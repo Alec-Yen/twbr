@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string>
 #include "MPU6050.h"
-#include "I2Cdev.h"
 #include "rc_twbr.hpp"
 
 using namespace std;
