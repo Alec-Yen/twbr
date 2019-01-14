@@ -15,7 +15,7 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value, maybe should just be 100
+int MAX_MOTOR = 100; // out of 100, TODO: trying to figure out optimal value, maybe should just be 100
 
 // for timing
 double sampleTime = 0.01; // in seconds
@@ -85,7 +85,7 @@ void PID (double& motorPower)
 	// print statements
 	if (PRINT_ANGLE && skip++==5) {
 		skip = 0;
-		printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\t\t motorPower %.2f\n",accAngle,gyroAngle,currentAngle,motorPower);
+		printf("accAngle=%10.2f\tgyroAngle=%10.2f\tcurrentAngle=%10.2f\tmotorPower=%10.2f\n",accAngle,gyroAngle,currentAngle,motorPower);
 	//	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 	}
 
@@ -108,9 +108,8 @@ void* Balance (void* robot_)
 	MPU6050 mpu;
 	mpu.initialize();
 
-	delay(100);
+	delay(1000);
 
-	// calibrate sensor TODO: see if this works
 	for (int n=0; n<50; n++) {
 		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
 		sensorZero[ACC_Y] += mpu.getAccelerationY();
@@ -118,10 +117,10 @@ void* Balance (void* robot_)
 		sensorZero[GYRO_X] += mpu.getRotationX();
 	}
 	for (int i=0; i<3; i++) sensorZero[i] /= 50;
-	sensorZero[ACC_Z] -= 16384; //TODO: figure out what value to put here (Kas uses 102)
+	sensorZero[ACC_Z] -= 16384; 
 
 	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
-
+	int AVERAGE_TIMES = 5; // number of values averaged together
 
 
 
@@ -131,12 +130,10 @@ void* Balance (void* robot_)
 
 		// read IMU values TODO: see if this works
 		for (int i=0; i<3; i++) sensorValue[i] = 0;
-		for (int n=0; n<5; n++) {
-			sensorValue[ACC_Y] += mpu.getAccelerationY();
-			sensorValue[ACC_Z] += mpu.getAccelerationZ();
-			sensorValue[GYRO_X] += mpu.getRotationX();
-		}
-		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/5 - sensorZero[i];
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[ACC_Y] += mpu.getAccelerationY();
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[ACC_Z] += mpu.getAccelerationZ();
+		for (int n=0; n<AVERAGE_TIMES; n++) sensorValue[GYRO_X] += mpu.getRotationX();
+		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/AVERAGE_TIMES - sensorZero[i];
 	
 		// convert IMU values
 		accY = sensorValue[ACC_Y]/16384.0;
