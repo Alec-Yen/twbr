@@ -15,14 +15,14 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 100; // out of 100, TODO: trying to figure out optimal value, might be 100 
+int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value, might be 100 
 
 // for timing
-double sampleTime = 0.01; // in seconds, or 10 milliseconds
 int STD_LOOP_TIME = 10; // in milliseconds TODO: Kas does 9 for some reason           
 int lastLoopTime = STD_LOOP_TIME;
 int lastLoopUsefulTime = STD_LOOP_TIME;
 unsigned long loopStartTime;
+double sampleTime = STD_LOOP_TIME/1000.0; // in seconds, or 10 milliseconds
 
 // for PID method
 double Kp, Kd, Ki;  // PID coefficients
@@ -69,7 +69,7 @@ void PID (double& motorPower)
 
 
 	// print statements
-	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
+	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\t\t motorPower %.2f\n",accAngle,gyroAngle,currentAngle,motorPower);
 	//	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
 	// debug for testing without running motors
