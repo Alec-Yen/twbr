@@ -15,7 +15,7 @@ bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 40; // out of 100, TODO: trying to figure out optimal value, might be 100 
+int MAX_MOTOR = 100; // out of 100, TODO: trying to figure out optimal value, might be 100 
 
 // for timing
 double sampleTime = 0.01; // in seconds, or 10 milliseconds
@@ -54,8 +54,8 @@ void PID (double& motorPower)
 	pthread_mutex_unlock (&lock);
 	changeInAngle = currentAngle - prevAngle;
 	pTerm = Kp*err;
-	iTerm += Ki*err*sampleTime;// TODO: don't need to account for time if time is set
-	dTerm = Kd*changeInAngle/sampleTime;
+	iTerm += Ki*err;
+	dTerm = Kd*changeInAngle;
 
 	motorPower = pTerm + iTerm + dTerm;
 	prevAngle = currentAngle;
@@ -106,7 +106,7 @@ void* Balance (void* robot_)
 
 
 		// code to make sure loop executes with precise timing
-		printf("lastLoopUsefulTime=%10d loopStartTime=%10lu lastLoopTime=%10d\n",lastLoopUsefulTime,loopStartTime,lastLoopTime);
+		//printf("lastLoopUsefulTime=%10d loopStartTime=%10lu lastLoopTime=%10d\n",lastLoopUsefulTime,loopStartTime,lastLoopTime);
 		lastLoopUsefulTime = millis()-loopStartTime;
 		if(lastLoopUsefulTime<STD_LOOP_TIME)			delay(STD_LOOP_TIME-lastLoopUsefulTime);
 		lastLoopTime = millis() - loopStartTime;
