@@ -1,6 +1,11 @@
 # TODO
 
 ## NOW
+http://forum.arduino.cc/index.php?topic=8871.30
+http://forum.arduino.cc/index.php/topic,8652.0.html
+
+
+## OVER WINTER BREAK
 Write code to move forward and turn - balance_roboclaw/src/twbr.cpp 
 Write code using PID advice - balance_roboclaw/src/pid.cpp
 	https://www.embeddedrelated.com/showarticle/943.php
