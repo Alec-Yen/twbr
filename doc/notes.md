@@ -21,3 +21,9 @@ A "standoff" was used with the IMU to keep in place, didn't seem to do very much
 Division of responsibility  
 Raspberry Pi - imu, roboclaw, lcd  
 Arduino - batt, ultrasonic  
+
+
+## Dean's Suggestions from December 2018
+Increase max speed  
+Use encoder to account for varying surfaces  
+Eventually control motors separately  
