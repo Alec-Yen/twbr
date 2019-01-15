@@ -26,6 +26,7 @@ class TWBR {
 		PiMotor rMotor;
 	public:
 		TWBR(int,int,int,int);
+		void writePWMSame (int FB,int speed);
 		void moveSame(int FB, int speed, double ms);
 		void wait(double ms);
 		void stop();

@@ -32,6 +32,7 @@ double prevAngle = 0;
 clock_t prev_t;
 double motorTime = 0.01; // seconds
 
+
 // multithreading shared variables
 pthread_mutex_t lock; // for thread safe code
 bool break_condition = false;
@@ -75,10 +76,10 @@ void PID (double& motorPower, int& direction)
 
 	// determine direction and get magnitude of power
 	if (motorPower < 0) {
-		direction = 1;
+		direction = 0;
 		motorPower *= -1;
 	}
-	else direction = 0;
+	else direction = 1;
 
 	// print statements
 	if (PRINT) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);

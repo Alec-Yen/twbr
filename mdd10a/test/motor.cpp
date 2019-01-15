@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstdlib>
 #include <stdio.h>
 #include "PiMotor.h"
@@ -10,14 +11,21 @@ int p2 = 12;
 int d2 = 16;
 
 int main(int argc, char** argv) {
-    //Create a new instance for our Motor.
+	//Create a new instance for our Motor.
 
-		TWBR robot(p1,d1,p2,d2);
-		robot.moveSame (0,20,1000);
-		robot.wait(100);
-		robot.moveSame (1,20,1000);
-    
-   
-    return 0;
+	int s;
+	TWBR robot(p1,d1,p2,d2);
+	while (1) {
+		if (cin >> s) {
+//			robot.moveSame (0,s,1000);
+//			wait(100);
+//			robot.moveSame (1,s,1000);
+			robot.writePWMSame(0,s);
+			cin.clear();
+		}
+	}
+
+
+	return 0;
 }
 

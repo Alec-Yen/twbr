@@ -76,7 +76,7 @@ while True:
 	
 	angle = math.atan(Ay/Az)*360/3.14159
 
-  #     print ("Gx=%5.2f" %Gx,"Gy=%5.2f" %Gy ,"Gz=%5.2f" %Gz, "Ax=%5.2f g" %Ax, "Ay=%5.6f g" %Ay, "Az=%5.6f g" %Az)
+	print ("Gx=%5.2f" %Gx,"Gy=%5.2f" %Gy ,"Gz=%5.2f" %Gz, "Ax=%5.2f g" %Ax, "Ay=%5.6f g" %Ay, "Az=%5.6f g" %Az)
 	print("angle = %.6f" %angle)
 	sleep(1)
 

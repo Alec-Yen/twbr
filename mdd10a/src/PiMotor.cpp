@@ -23,6 +23,19 @@ void TWBR::moveSame (int FB,int speed, double ms)
 	rMotor.run(rd, 0);
 }
 
+
+void TWBR::writePWMSame (int FB,int speed)
+{
+	int ld, rd;
+	if (FB) { ld = 0; rd = 1; }
+	else { ld = 1; rd = 0; }
+
+	lMotor.run(ld, speed);
+	rMotor.run(rd, speed);
+}
+
+
+
 void TWBR::wait (double ms)
 {
 	usleep (ms*1000.0);

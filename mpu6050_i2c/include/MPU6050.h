@@ -1,3 +1,6 @@
+#ifndef MPU6050_H
+#define MPU6050_H
+
 #include <stdio.h>
 #include <linux/i2c-dev.h>
 #include <stdlib.h>
@@ -46,3 +49,5 @@ class MPU6050 {
 		int8_t power;
 		int fd;
 };
+
+#endif // MPU6050_H

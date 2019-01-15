@@ -14,13 +14,10 @@ using namespace std;
 // global variables
 bool PRINT_ANGLE = 1; // set to 1 to print out angles and PID terms
 bool DEBUG = 0; // set to 1 to avoid running the motors (testing only angle)
-int p1 = 18; //Left PWM (refers to BCM numbers "GPIO 18", not the physical pins)
-int d1 = 23; //Left DIR
-int p2 = 12; //Right PWM
-int d2 = 16; //Right DIR
 double targetAngle = 0;
 double RAD_TO_DEG = 180.0/3.14159;
-int MAX_MOTOR = 50; // TODO: this value is going to be lower using roboclaw since it is out of 100
+int MAX_MOTOR = 40; // TODO: this value is going to be lower using roboclaw since it is out of 100
+int count = 0; // TODO: don't want to have to include
 
 // for PID method
 double Kp, Kd, Ki;  // PID coefficients
@@ -62,7 +59,7 @@ void PID (double& motorPower)
 	pthread_mutex_unlock (&lock);
 	changeInAngle = currentAngle - prevAngle;
 	pTerm = Kp*err;
-	iTerm += Ki*err*sampleTime;
+	iTerm += Ki*err*sampleTime;// TODO: don't need to account for time if time is set
 	dTerm = Kd*changeInAngle/sampleTime;
 
 	motorPower = pTerm + iTerm + dTerm;
@@ -72,16 +69,20 @@ void PID (double& motorPower)
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
+	// TODO: had to include to fix it
+	motorPower *= -1;
+
 
 	// print statements
 	if (PRINT_ANGLE) printf("accAngle %.2f\t gyroAngle %.6f\t\t currentAngle %.2f\n",accAngle,gyroAngle,currentAngle);
-	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
+//	if (PRINT_ANGLE) printf("pTerm = %.2f\t iTerm = %.2f\t dTerm = %.2f\t motorPower = %.2f\n",pTerm,iTerm,dTerm,motorPower);
 
 	// debug for testing without running motors
 	if (DEBUG) {
 		motorPower = 0; //DEBUGGING: for testing without running motors
 		return;
 	}
+	
 
 }
 

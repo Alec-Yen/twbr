@@ -1,7 +1,9 @@
+BASEDIR = ..
 SRC = src
 BIN = bin
 OBJ = obj
 INC = include
+UTIL = $(BASEDIR)/util
 
 CC = gcc
 CXX = g++ -std=c++98
@@ -12,7 +14,6 @@ LFLAGS =  -Wall -Wextra $(DEBUG) -lpthread
 LIBS = -lpigpio -lrt -l bcm2835 -l m
 
 
-BASEDIR = ..
 IMU_DIR = $(BASEDIR)/mpu6050_bcm2835
 MOTOR_DIR = $(BASEDIR)/mdd10a
 
@@ -22,7 +23,7 @@ MOTOR_INC = $(MOTOR_DIR)/$(INC)/PiMotor.h
 IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
 MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/PiMotor.o
 
-BIN_FILES = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/stop
+BIN_FILES = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop
 OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ)
 all: $(BIN_FILES)
 
@@ -35,15 +36,18 @@ $(BIN)/balance_thread11: $(OBJ)/balance_thread11.o $(OBJ_FILES)
 $(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
+$(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJ_FILES)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
 $(BIN)/stop: $(OBJ)/stop.o $(OBJ_FILES)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 # balance obj
 $(OBJ)/%.o: $(TEST)/%.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(UTIL) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(UTIL) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
 
 
 # special case that needs c++11

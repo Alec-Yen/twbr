@@ -16,5 +16,6 @@ Dependencies:
 ## Notes
 imu_readings.cpp - print accelerometer and gyroscope readings
 https://github.com/jrowberg/i2cdevlib   
+https://store.invensense.com/datasheets/invensense/MPU-6050_DataSheet_V3%204.pdf
 
 
