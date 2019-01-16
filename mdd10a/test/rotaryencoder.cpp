@@ -31,7 +31,7 @@ struct encoder *setupencoder(int pin_a, int pin_b);
 
 
 
-int numberofencoders = 2;
+int numberofencoders = 0;
 
 void updateEncoders()
 {
@@ -84,9 +84,9 @@ int d2 = 16;
 int main()
 {
 	TWBR robot(p1,d1,p2,d2);
-	robot.writePWMSame(0,40);
+	robot.writePWMSame(0,10);
 
-	wiringPiSetup();
+	wiringPiSetupGpio();
 	struct encoder *enc1 = setupencoder(17,27);
 	struct encoder *enc2 = setupencoder(5,6);
 	while(1) {
