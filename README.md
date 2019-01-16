@@ -3,5 +3,5 @@
 Classic application from control theory of the inverted pendulum.
 
 ## Instructions
-
-Run `./build`
+Download the necessary libraries in doc/instructions.md  
+Run `./build`  

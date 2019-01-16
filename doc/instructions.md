@@ -4,13 +4,6 @@ Following is how to install dependencies that are not by default installed on a 
 
 ## REQUIRED
 
-### libi2c-dev - mpu6050_i2c, lcd-i2c
-```
-sudo apt-get install libi2c-dev
-```
-
-## OPTIONAL
-
 ### pigpio - mdd10a, hc-sr04
 
 ```
@@ -37,7 +30,14 @@ sudo make check
 sudo make install
 ```
 
+### libi2c-dev - mpu6050_i2c, lcd-i2c
+```
+sudo apt-get install libi2c-dev
+```
 
+
+
+## OPTIONAL
 
 
 ### wiringPi - not actually required for anything (is analogous to pigpio)
