@@ -4,20 +4,17 @@ Following is how to install dependencies that are not by default installed on a 
 
 ## REQUIRED
 
-### pigpio - mdd10a, hc-sr04
+### wiringPi - required for one version of PiMotor, required for encoders
 
 ```
 cd
-rm pigpio.zip
-sudo rm -rf PIGPIO
-wget abyz.me.uk/rpi/pigpio/pigpio.zip
-unzip pigpio.zip
-cd PIGPIO
-make
-sudo make install
+git clone git://git.drogon.net/wiringPi
+cd wiringPi
+git pull origin
+./build
 ```
 
-### bcm2835 - mpu6050_bcm2835
+### bcm2835 - required for MPU6050
 
 ```
 cd
@@ -30,22 +27,29 @@ sudo make check
 sudo make install
 ```
 
-### libi2c-dev - mpu6050_i2c, lcd-i2c
-```
-sudo apt-get install libi2c-dev
-```
 
 
 
 ## OPTIONAL
 
 
-### wiringPi - not actually required for anything (is analogous to pigpio)
+### libi2c-dev - not required, was used in attempt to communicate with MPU6050
+```
+sudo apt-get install libi2c-dev
+```
+### pigpio - mdd10a, hc-sr04
 
+
+
+### pigpio - analogous to wiringPi, required for one (currently unused) version of PiMotor
 ```
 cd
-git clone git://git.drogon.net/wiringPi
-cd wiringPi
-git pull origin
-./build
+rm pigpio.zip
+sudo rm -rf PIGPIO
+wget abyz.me.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+cd PIGPIO
+make
+sudo make install
 ```
+

@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <time.h>
+#include "twbr.h"
 #include "PiMotor.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"

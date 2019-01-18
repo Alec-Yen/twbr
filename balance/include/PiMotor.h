@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <pigpio.h>
+#include <wiringPi.h>
 #include <unistd.h>
 
 #ifndef PIMOTOR_H
@@ -18,18 +18,6 @@ class PiMotor {
 		void runForMS(int,int,double ms);
 		void stop();
 		void setDebug(bool); 
-};
-
-class TWBR {
-	protected:
-		PiMotor lMotor;
-		PiMotor rMotor;
-	public:
-		TWBR(int,int,int,int);
-		void writePWMSame (int FB,int speed);
-		void moveSame(int FB, int speed, double ms);
-		void wait(double ms);
-		void stop();
 };
 
 

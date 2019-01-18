@@ -49,12 +49,12 @@ uint64 GetTimeMs64()
 
 
 
-// millis function
-uint64 millis ()
+// millis function TODO: already exists in wiringPi
+/*uint64 millis ()
 {
 	return GetTimeMs64();
 }
-
+*/
 
 void delay (int ms)
 {

@@ -1,10 +1,7 @@
-#include <wiringPi.h>
-#include <pigpio.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-
+#include "twbr.h"
 #include "PiMotor.h"
 
 #define max_encoders 8

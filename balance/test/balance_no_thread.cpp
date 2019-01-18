@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <signal.h>
+#include "twbr.h"
 #include "PiMotor.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"

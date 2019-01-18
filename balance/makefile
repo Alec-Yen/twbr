@@ -3,7 +3,7 @@ SRC = src
 BIN = bin
 OBJ = obj
 INC = include
-UTIL = $(BASEDIR)/util
+TEST = test
 
 CC = gcc
 CXX = g++ -std=c++98
@@ -11,69 +11,58 @@ DEBUG = -g
 CFLAGS = -Wall -Wextra -c $(DEBUG) -lpthread
 CXX_FLAGS = -Wall -Wextra -c $(DEBUG) -lpthread
 LFLAGS =  -Wall -Wextra $(DEBUG) -lpthread
-LIBS = -lpigpio -lrt -l bcm2835 -l m
+LIBS = -lpigpio -lrt -lbcm2835 -lwiringPi
 
 
-IMU_DIR = $(BASEDIR)/mpu6050_bcm2835
-MOTOR_DIR = $(BASEDIR)/mdd10a
+HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h
 
-IMU_INC = $(IMU_DIR)/$(INC)/MPU6050.h $(IMU_DIR)/$(INC)/I2Cdev.h
-MOTOR_INC = $(MOTOR_DIR)/$(INC)/PiMotor.h
+TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop $(BIN)/rotaryencoder $(BIN)/motor-test $(BIN)/imu_readings
 
-IMU_OBJ = $(IMU_DIR)/$(OBJ)/MPU6050.o $(IMU_DIR)/$(OBJ)/I2Cdev.o
-MOTOR_OBJ = $(MOTOR_DIR)/$(OBJ)/PiMotor.o
+OBJECTS = $(OBJ)/MPU6050.o $(OBJ)/I2Cdev.o $(OBJ)/PiMotor.o $(INC)/twbr.o
 
-BIN_FILES = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop
-OBJ_FILES = $(IMU_OBJ) $(MOTOR_OBJ)
-all: $(BIN_FILES)
+
+all: $(TARGETS)
 
 
 
-# balance bin
-$(BIN)/balance_thread11: $(OBJ)/balance_thread11.o $(OBJ_FILES)
+# bins
+$(BIN)/balance_thread11: $(OBJ)/balance_thread11.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJ_FILES)
+$(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJ_FILES)
+$(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/stop: $(OBJ)/stop.o $(OBJ_FILES)
+$(BIN)/stop: $(OBJ)/stop.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-# balance obj
+$(BIN)/rotaryencoder: $(OBJ)/rotaryencoder.o $(OBJECTS)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+$(BIN)/motor-test: $(OBJ)/motor-test.o $(OBJECTS)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+$(BIN)/imu_readings: $(OBJ)/imu_readings.o $(OBJECTS)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+
+# objects
 $(OBJ)/%.o: $(TEST)/%.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(UTIL) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CXX) $(CXX_FLAGS) -I$(INC) -I$(UTIL) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
+
+$(OBJ)/%.o: $(INC)/%.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
 
 # special case that needs c++11
-$(OBJ)/balance_thread11.o: $(SRC)/balance_thread11.cpp
-	g++ -std=c++11 $(CXX_FLAGS) -I$(INC) -I$(IMU_DIR)/$(INC) -I$(MOTOR_DIR)/$(INC) $< -o $@
-
-
-
-# motor obj
-$(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.cpp $(MOTOR_INC) 
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
-
-$(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.cpp $(MOTOR_INC)
-	$(CXX) $(CXX_FLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
-
-$(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(TEST)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
-
-$(MOTOR_DIR)/$(OBJ)/%.o: $(MOTOR_DIR)/$(SRC)/%.c $(MOTOR_INC)
-	$(CC) $(CFLAGS) -I$(MOTOR_DIR)/$(INC) $< -o $@
-
-# imu obj
-$(IMU_DIR)/$(OBJ)/%.o: $(IMU_DIR)/$(SRC)/%.cpp $(IMU_INC)
-	$(CXX) $(CXX_FLAGS) -I$(IMU_DIR)/$(INC) $< -o $@
-
+$(OBJ)/balance_thread11.o: $(TEST)/balance_thread11.cpp
+	g++ -std=c++11 $(CXX_FLAGS) -I$(INC) $< -o $@
 
 
 clean:
-	rm -f $(OBJ)/*.o $(BIN_FILES)
+	rm -f $(OBJ)/*.o $(TARGETS)
