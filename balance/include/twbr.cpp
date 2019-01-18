@@ -1,7 +1,9 @@
 #include "twbr.h"
 
 
+// calls setup function TODO maybe don't do that
 TWBR::TWBR(int p1, int d1, int p2, int d2) {
+	wiringPiSetupGpio();
 	lMotor = PiMotor(0,p1,d1);
 	rMotor = PiMotor(1,p2,d2);
 }

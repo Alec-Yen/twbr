@@ -5,6 +5,7 @@
 #ifndef PIMOTOR_H
 #define PIMOTOR_H
 
+
 class PiMotor {
 	protected:
 		int motorID; // either 0 (for the left) or 1 (for the right)

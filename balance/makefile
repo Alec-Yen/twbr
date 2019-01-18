@@ -16,7 +16,7 @@ LIBS = -lpigpio -lrt -lbcm2835 -lwiringPi
 
 HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h
 
-TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop $(BIN)/rotaryencoder $(BIN)/motor-test $(BIN)/imu_readings
+TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop $(BIN)/rotaryencoder $(BIN)/motor-test $(BIN)/imu_readings $(BIN)/encoder-test
 
 OBJECTS = $(OBJ)/MPU6050.o $(OBJ)/I2Cdev.o $(OBJ)/PiMotor.o $(INC)/twbr.o
 
@@ -46,6 +46,10 @@ $(BIN)/motor-test: $(OBJ)/motor-test.o $(OBJECTS)
 
 $(BIN)/imu_readings: $(OBJ)/imu_readings.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
+$(BIN)/encoder-test: $(OBJ)/encoder-test.o $(OBJECTS)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
 
 
 # objects

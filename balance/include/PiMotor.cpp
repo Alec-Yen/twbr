@@ -2,10 +2,10 @@
 
 // uses wiringPi library
 
-//TODO: might need to call wiringPiSetupGpio
 
-
-PiMotor::PiMotor() {}
+PiMotor::PiMotor()
+{
+}
 
 PiMotor::PiMotor(int motorID_, int pwmPin_, int dirPin_) {
     if (DEBUG) {
