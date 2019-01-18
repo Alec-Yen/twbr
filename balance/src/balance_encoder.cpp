@@ -69,13 +69,13 @@ void PID (double& motorPower, int& direction)
 	long currentEnc;
 
 	double pTerm,dTerm,pTerm_dx,dTerm_dx;
-	
+
 	// calculate the angle of inclination
 	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
 	gyroRate = gyroX; // degrees/second
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
-	
+
 	// get encoder
 	currentEnc = (enc1_val+enc2_val)/2;
 
@@ -194,15 +194,19 @@ void* Stop (void* robot_)
 	char q;
 	TWBR* robot = (TWBR *)robot_;
 
-	scanf("%c",&q);
-	if (q == 'q') {
-		break_condition = true;
-		printf("Breaking out of loop\n");
+	while(!break_condition) {
+		scanf("%c",&q);
+		if (q == 'q') {
+			break_condition = true;
+			printf("Breaking out of loop\n");
 
-		pthread_mutex_lock (&lock);
-		delay(100);
-		robot->writePWMSame(1,0);
-		pthread_mutex_unlock (&lock);
+			pthread_mutex_lock (&lock);
+			delay(100);
+			robot->writePWMSame(1,0);
+			pthread_mutex_unlock (&lock);
+		}
+		fflush(stdin);
+
 	}
 	return NULL;
 }
@@ -227,7 +231,7 @@ int main(int argc, char** argv)
 
 	// initialize everything
 	TWBR *robot = new TWBR(p1,d1,p2,d2);
-	
+
 	// multithreading
 	pthread_t loop_thread, break_thread;
 
