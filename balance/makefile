@@ -16,7 +16,9 @@ LIBS = -lpigpio -lrt -lbcm2835 -lwiringPi
 
 HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h
 
-TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/stop $(BIN)/rotaryencoder $(BIN)/motor-test $(BIN)/imu_readings $(BIN)/encoder-test
+BALANCE_TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/balance_encoder
+TEST_TARGETS = $(BIN)/stop $(BIN)/motor-test $(BIN)/imu-test $(BIN)/encoder-test
+TARGETS = $(BALANCE_TARGETS) $(TEST_TARGETS)
 
 OBJECTS = $(OBJ)/MPU6050.o $(OBJ)/I2Cdev.o $(OBJ)/PiMotor.o $(INC)/twbr.o
 
@@ -25,7 +27,7 @@ all: $(TARGETS)
 
 
 
-# bins
+# balance targets
 $(BIN)/balance_thread11: $(OBJ)/balance_thread11.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
@@ -35,16 +37,19 @@ $(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJECTS)
 $(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/stop: $(OBJ)/stop.o $(OBJECTS)
+$(BIN)/balance_encoder: $(OBJ)/balance_encoder.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/rotaryencoder: $(OBJ)/rotaryencoder.o $(OBJECTS)
+
+# test targets
+
+$(BIN)/stop: $(OBJ)/stop.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 $(BIN)/motor-test: $(OBJ)/motor-test.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/imu_readings: $(OBJ)/imu_readings.o $(OBJECTS)
+$(BIN)/imu-test: $(OBJ)/imu-test.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 $(BIN)/encoder-test: $(OBJ)/encoder-test.o $(OBJECTS)

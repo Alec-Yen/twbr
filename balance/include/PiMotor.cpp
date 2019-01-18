@@ -1,11 +1,8 @@
 #include "PiMotor.h"
 
-// uses wiringPi library
+// uses PIGPIO library
 
-
-PiMotor::PiMotor()
-{
-}
+PiMotor::PiMotor() {}
 
 PiMotor::PiMotor(int motorID_, int pwmPin_, int dirPin_) {
     if (DEBUG) {
@@ -25,16 +22,24 @@ void PiMotor::setDebug(bool debug) {
 }
 
 void PiMotor::stop() {
-
-    pinMode(pwmPin, PWM_OUTPUT); // set GPIO pin as output
-		pinMode(dirPin, OUTPUT);
-    pwmWrite(pwmPin, 0);
-		digitalWrite(dirPin, 0); //FIX: potential bug?
+    //Initialise GPIO.
+    if (gpioInitialise() < 0) {
+        if (DEBUG) {
+            fprintf(stderr, "PiGPIO initialisation failed.\n\r");
+        }
+      return;
+   }
+    gpioSetMode(pwmPin, PI_OUTPUT); // set GPIO pin as output
+		gpioSetMode(dirPin, PI_OUTPUT);
+    gpioPWM(pwmPin, 0);
+		gpioWrite(dirPin, 0); //FIX: potential bug?
     
     if (DEBUG) {
         printf("Stopping motors on pin %i.\n\r", pwmPin);
     }
    
+   //Free resources & GPIO access
+   gpioTerminate();   
 }
 
 // direction = 0 (forward), 1 (backward)
@@ -59,12 +64,20 @@ void PiMotor::runForMS(int direction, int speed, double ms) {
 // speed is from 0 to 255
 void PiMotor::run (int direction, int speed) {
 
+	//Initialise GPIO.
+    if (gpioInitialise() < 0) {
+        if (DEBUG) {
+            fprintf(stderr, "PiGPIO initialisation failed in PiMotor::run.\n\r");
+        }
+      return;
+	  }
+  
    //Set motor as output.
-    pinMode(pwmPin, PWM_OUTPUT);
-    pinMode(dirPin, OUTPUT);
+    gpioSetMode(pwmPin, PI_OUTPUT);
+    gpioSetMode(dirPin, PI_OUTPUT);
 
-    pwmWrite(pwmPin, speed);
-    digitalWrite(dirPin, direction); // FIX: will need to fix this depending if left or right
+    gpioPWM(pwmPin, speed);
+    gpioWrite(dirPin, direction); // FIX: will need to fix this depending if left or right
 
    
    //Free resources & GPIO access

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <wiringPi.h>
+#include <pigpio.h>
 #include <unistd.h>
 
 #ifndef PIMOTOR_H
