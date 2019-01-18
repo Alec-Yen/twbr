@@ -127,14 +127,14 @@ void* Balance (void* robot_)
 	int direction;
 	TWBR* robot = (TWBR *)robot_;
 
-	cout << "everything fine" << endl;
-
+	// initialize everything
 	I2Cdev::initialize();
 	MPU6050 mpu;
 	mpu.initialize();
 
-	delay(100);
+	delay(100); // wait a moment
 
+	// zero out the IMU
 	for (int n=0; n<50; n++) {
 		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
 		sensorZero[ACC_Y] += mpu.getAccelerationY();
@@ -145,7 +145,7 @@ void* Balance (void* robot_)
 	sensorZero[ACC_Z] -= 16384; 
 
 	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
-	int AVERAGE_TIMES = 5; // number of values averaged together
+	int AVERAGE_TIMES = 5; // number of values averaged together for imu
 
 	// balancing loop
 	loopStartTime = millis();
@@ -172,6 +172,7 @@ void* Balance (void* robot_)
 		// calculate PID
 		PID(motorPower,direction);
 
+		// write to motors
 		pthread_mutex_lock (&lock);
 		robot->writePWMSame(direction,motorPower);
 		pthread_mutex_unlock (&lock);
