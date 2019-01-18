@@ -85,8 +85,8 @@ void PID (double& motorPower, int& direction)
 	pthread_mutex_unlock (&lock);
 
 	pTerm = Kp*err_angle;
-	iTerm += Ki*err_angle*sampleTime;
-	dTerm = Kd*(currentAngle - prevAngle)/sampleTime;
+	iTerm += Ki*err_angle;
+	dTerm = Kd*(currentAngle - prevAngle);
 	prevAngle = currentAngle;
 
 	// TODO: write this code
@@ -101,15 +101,17 @@ void PID (double& motorPower, int& direction)
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
 
+	// print statements
+	//if (PRINT) printf("currentAngle %3.2f\t enc1 = %ld\t enc2 = %ld\t enc_av = %ld\t motorPower = %3.2f\n",currentAngle,enc1_val,enc2_val,currentEnc,motorPower);
+	if (PRINT) printf("currAng = %6.2f currEnc = %6ld\t pTerm = %6.2f iTerm = %6.2f dTerm = %6.2f pTerm_dx = %6.2f dTerm_dx = %6.2f motorPower = %6.2f\n",currentAngle,currentEnc,pTerm, iTerm, dTerm, pTerm_dx,dTerm_dx,motorPower);
+
+
 	// determine direction and get magnitude of power
 	if (motorPower < 0) {
 		direction = 0;
 		motorPower *= -1;
 	}
 	else direction = 1;
-
-	// print statements
-	if (PRINT) printf("currentAngle %3.2f\t enc1 = %ld\t enc2 = %ld\t enc_av = %ld\t motorPower = %3.2f\n",currentAngle,enc1_val,enc2_val,currentEnc,motorPower);
 
 	// debug for testing without running motors
 	if (DEBUG) {
@@ -211,7 +213,7 @@ int main(int argc, char** argv)
 	// check command line arguments
 	if (argc != 8) {
 		fprintf(stderr,"usage: sudo %s Kp Ki Kd Kp_dx Kd_dx PRINT DEBUG\n",argv[0]);
-		fprintf(stderr,"\tsudo %s 32 0 .4 0 0 0 0\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 32 .1 40 0 2 1 0\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);
