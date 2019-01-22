@@ -1,5 +1,7 @@
 # NOTES
 
+Shared Pi IP Address: 10.130.73.179
+
 ## 12/7/2018
 Best combo with battery at bottom: 60 .5 .5   
 Max Speed: 60, Sample Time: 0.01 s  
