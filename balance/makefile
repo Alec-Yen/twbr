@@ -14,9 +14,9 @@ LFLAGS =  -Wall -Wextra $(DEBUG) -lpthread
 LIBS = -lpigpio -lrt -lbcm2835 -lwiringPi
 
 
-HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h
+HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h $(INC)/encoder.h
 
-BALANCE_TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/balance_encoder
+BALANCE_TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/balance_encoder $(BIN)/balance_encoder_nc
 TEST_TARGETS = $(BIN)/stop $(BIN)/motor-test $(BIN)/imu-test $(BIN)/encoder-test
 TARGETS = $(BALANCE_TARGETS) $(TEST_TARGETS)
 
@@ -40,6 +40,8 @@ $(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJECTS)
 $(BIN)/balance_encoder: $(OBJ)/balance_encoder.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
+$(BIN)/balance_encoder_nc: $(OBJ)/balance_encoder_nc.o $(OBJECTS)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 # test targets
 
@@ -64,7 +66,7 @@ $(OBJ)/%.o: $(TEST)/%.cpp
 $(OBJ)/%.o: $(SRC)/%.cpp
 	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
-$(OBJ)/%.o: $(INC)/%.cpp
+$(OBJ)/%.o: $(INC)/%.cpp $(INC)/%.h
 	$(CXX) $(CXX_FLAGS) -I$(INC) $< -o $@
 
 

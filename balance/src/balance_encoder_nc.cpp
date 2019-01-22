@@ -1,4 +1,5 @@
 // Updated balance program to work with c++98
+// This code doesn't zero out angle readings before running
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -133,14 +134,14 @@ void* Balance (void* robot_)
 	mpu.initialize();
 
 	delay(100); // wait a moment
-
+/*
 	// zero out the IMU
 	for (int n=0; n<50; n++) {
 		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
 		sensorZero[ACC_Y] += mpu.getAccelerationY();
 		sensorZero[ACC_Z] += mpu.getAccelerationZ();
 		sensorZero[GYRO_X] += mpu.getRotationX();
-	}
+	}*/
 	for (int i=0; i<3; i++) sensorZero[i] /= 50;
 	sensorZero[ACC_Z] -= 16384; 
 
@@ -218,7 +219,7 @@ int main(int argc, char** argv)
 	// check command line arguments
 	if (argc != 8) {
 		fprintf(stderr,"usage: sudo %s Kp Ki Kd Kp_dx Kd_dx PRINT DEBUG\n",argv[0]);
-		fprintf(stderr,"\tsudo %s 55 6 55 .1 .8 0 0\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 32 .1 40 0 2 1 0\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);

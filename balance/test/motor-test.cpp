@@ -16,13 +16,12 @@ int main(int argc, char** argv) {
 
 	int s;
 	TWBR robot(p1,d1,p2,d2);
+	printf("Enter 'q' to quit.\nEnter PWM (0 to 255): ");
 	while (1) {
 		if (cin >> s) {
-//			robot.moveSame (0,s,1000);
-//			wait(100);
-//			robot.moveSame (1,s,1000);
 			robot.writePWMSame(0,s);
 			cin.clear();
+			printf("\nEnter PWM (0 to 255): ");
 		}
 	}
 
