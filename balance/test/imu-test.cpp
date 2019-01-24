@@ -32,8 +32,8 @@ int main()
 		double gyroZ = mpu.getRotationZ()/131.0;
 
 		// calculate angle
-		double accAngle = (double) atan(accY/accZ) * RAD_TO_DEG; //degrees
-		double gyroRate = gyroX; // degrees/second
+		double accAngle = (double) atan(accX/accZ) * RAD_TO_DEG; //degrees
+		double gyroRate = -gyroY; // degrees/second
 		double gyroAngle = gyroRate*sampleTime; // degrees
 		double currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*accAngle; // complementary filter
 		prevAngle = currentAngle;

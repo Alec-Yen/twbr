@@ -97,6 +97,9 @@ void PID (double& motorPower, int& direction)
 	// sum up to motorPower
 	motorPower = pTerm + iTerm + dTerm + pTerm_dx + dTerm_dx;
 
+	// TODO fix this
+//	motorPower *= -1;
+
 	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
@@ -135,14 +138,14 @@ void* Balance (void* robot_)
 	delay(100); // wait a moment
 
 	// zero out the IMU
-	for (int n=0; n<50; n++) {
+/*	for (int n=0; n<50; n++) {
 		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
 		sensorZero[ACC_Y] += mpu.getAccelerationY();
 		sensorZero[ACC_Z] += mpu.getAccelerationZ();
 		sensorZero[GYRO_X] += mpu.getRotationX();
 	}
 	for (int i=0; i<3; i++) sensorZero[i] /= 50;
-	sensorZero[ACC_Z] -= 16384; 
+*/	sensorZero[ACC_Z] -= 16384; 
 
 	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
 	int AVERAGE_TIMES = 5; // number of values averaged together for imu
@@ -162,7 +165,7 @@ void* Balance (void* robot_)
 
 		accY = sensorValue[ACC_Y]/16384.0;
 		accZ = sensorValue[ACC_Z]/16384.0;
-		gyroX = sensorValue[GYRO_X]/131.0;
+		gyroX = -sensorValue[GYRO_X]/131.0;
 
 		// read encoder values
 		updateEncoders();

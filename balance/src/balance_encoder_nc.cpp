@@ -35,7 +35,7 @@ int MAX_MOTOR = 200; // max is 255
 
 // for PID method
 double Kp, Kd, Ki, Kp_dx, Kd_dx; // PID coefficients 
-double accY, accZ, gyroX; // IMU measurements
+double accX, accZ, gyroY; // IMU measurements
 long enc1_val, enc2_val; // encoder values
 double iTerm = 0;
 double prevAngle = 0;
@@ -49,7 +49,7 @@ unsigned long loopStartTime;
 double sampleTime = STD_LOOP_TIME/1000.0; // in seconds
 
 // for IMU calibration
-enum IMU_Index {ACC_Y,ACC_Z,GYRO_X};
+enum IMU_Index {ACC_X,ACC_Z,GYRO_Y};
 int sensorZero[3] = {0,0,0}; // calibration
 int sensorValue[3] = {0,0,0}; // averaged raw IMU measurements
 
@@ -72,8 +72,8 @@ void PID (double& motorPower, int& direction)
 	double pTerm,dTerm,pTerm_dx,dTerm_dx;
 
 	// calculate the angle of inclination
-	accAngle = (double) atan2(accY, accZ) * RAD_TO_DEG; // degrees
-	gyroRate = gyroX; // degrees/second
+	accAngle = (double) atan2(accX, accZ) * RAD_TO_DEG; // degrees
+	gyroRate = gyroY; // degrees/second
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 
@@ -97,6 +97,8 @@ void PID (double& motorPower, int& direction)
 
 	// sum up to motorPower
 	motorPower = pTerm + iTerm + dTerm + pTerm_dx + dTerm_dx;
+
+	motorPower *= -1;
 
 	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
@@ -137,15 +139,15 @@ void* Balance (void* robot_)
 /*
 	// zero out the IMU
 	for (int n=0; n<50; n++) {
-		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_Y],&sensorTemp[ACC_Z],&sensorTemp[GYRO_X],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
-		sensorZero[ACC_Y] += mpu.getAccelerationY();
+		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_X],&sensorTemp[ACC_Z],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
+		sensorZero[ACC_X] += mpu.getAccelerationY();
 		sensorZero[ACC_Z] += mpu.getAccelerationZ();
-		sensorZero[GYRO_X] += mpu.getRotationX();
+		sensorZero[GYRO_Y] += mpu.getRotationX();
 	}*/
 	for (int i=0; i<3; i++) sensorZero[i] /= 50;
 	sensorZero[ACC_Z] -= 16384; 
 
-	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_Y]=%d\nsensorZero[GYRO_X]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_Y],sensorZero[GYRO_X]);
+	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_X]=%d\nsensorZero[GYRO_Y]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_X],sensorZero[GYRO_Y]);
 	int AVERAGE_TIMES = 5; // number of values averaged together for imu
 
 	// balancing loop
@@ -155,15 +157,15 @@ void* Balance (void* robot_)
 		// read IMU values
 		for (int i=0; i<3; i++) sensorValue[i] = 0;
 		for (int n=0; n<AVERAGE_TIMES; n++) {
-			sensorValue[ACC_Y] += mpu.getAccelerationY();
+			sensorValue[ACC_X] += mpu.getAccelerationX();
 			sensorValue[ACC_Z] += mpu.getAccelerationZ();
-			sensorValue[GYRO_X] += mpu.getRotationX();
+			sensorValue[GYRO_Y] += mpu.getRotationY();
 		}
 		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/AVERAGE_TIMES - sensorZero[i];
 
-		accY = sensorValue[ACC_Y]/16384.0;
+		accX = sensorValue[ACC_X]/16384.0;
 		accZ = sensorValue[ACC_Z]/16384.0;
-		gyroX = sensorValue[GYRO_X]/131.0;
+		gyroY = -1*sensorValue[GYRO_Y]/131.0;
 
 		// read encoder values
 		updateEncoders();
