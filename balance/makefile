@@ -16,7 +16,7 @@ LIBS = -lpigpio -lrt -lbcm2835 -lwiringPi
 
 HEADERS = $(INC)/MPU6050.h $(INC)/I2Cdev.h $(INC)/PiMotor.h $(INC)/twbr.h $(INC)/timing.h $(INC)/encoder.h
 
-BALANCE_TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/balance_encoder $(BIN)/balance_encoder_nc
+BALANCE_TARGETS = $(BIN)/balance_thread11 $(BIN)/balance_pthread $(BIN)/balance_timing $(BIN)/balance_final $(BIN)/balance_calibration
 TEST_TARGETS = $(BIN)/stop $(BIN)/motor-test $(BIN)/imu-test $(BIN)/encoder-test
 TARGETS = $(BALANCE_TARGETS) $(TEST_TARGETS)
 
@@ -37,10 +37,10 @@ $(BIN)/balance_pthread: $(OBJ)/balance_pthread.o $(OBJECTS)
 $(BIN)/balance_timing: $(OBJ)/balance_timing.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/balance_encoder: $(OBJ)/balance_encoder.o $(OBJECTS)
+$(BIN)/balance_final: $(OBJ)/balance_final.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
-$(BIN)/balance_encoder_nc: $(OBJ)/balance_encoder_nc.o $(OBJECTS)
+$(BIN)/balance_calibration: $(OBJ)/balance_calibration.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 # test targets

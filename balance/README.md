@@ -13,7 +13,7 @@ test/ - testing programs
 ## Getting Started    
 Run the makefile  
 Hold robot upright with battery at 12V  
-Execute `sudo ./bin/balance_encoder 55 6 55 .1 .8 0 0`  
+Execute `sudo ./bin/balance_encoder 90 10 90 -.6 -.5`  
 To stop, type "q" and press ENTER  
   
 ## Troubleshooting  
@@ -24,8 +24,11 @@ The robot needs to be perfectly balanced. The slightest imbalance (due to a hang
   
   
 ## Notes     
-balance_encoder.cpp - best version, uses encoder and imu input  
+src
+balance_final.cpp - best version, uses encoder and imu input
   
+test (WARNING: the angles are calculated using the red Sparkfun MPU6050's orientation, not with our blue one)
+balance_calibration.cpp - uses calibration and averages imu input
 balance_timing.cpp - uses imu input    
 balance_pthread.cpp - uses c++98 threading    
 balance_thread11.cpp - uses c++11 threading, will be replaced    

@@ -50,7 +50,7 @@ double sampleTime = STD_LOOP_TIME/1000.0; // in seconds
 
 // for IMU calibration
 enum IMU_Index {ACC_X,ACC_Z,GYRO_Y};
-int sensorZero[3] = {0,0,0}; // calibration
+int sensorZero[3] = {0,-16384,0}; // calibration
 int sensorValue[3] = {0,0,0}; // averaged raw IMU measurements
 
 // for encoders
@@ -98,6 +98,7 @@ void PID (double& motorPower, int& direction)
 	// sum up to motorPower
 	motorPower = pTerm + iTerm + dTerm + pTerm_dx + dTerm_dx;
 
+	// TODO: fix this
 	motorPower *= -1;
 
 	// keep within max power
@@ -136,18 +137,8 @@ void* Balance (void* robot_)
 	mpu.initialize();
 
 	delay(100); // wait a moment
-/*
-	// zero out the IMU
-	for (int n=0; n<50; n++) {
-		//mpu.getMotion6 (&sensorTemp[ACC_X],&sensorTemp[ACC_X],&sensorTemp[ACC_Z],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Y],&sensorTemp[GYRO_Z]);
-		sensorZero[ACC_X] += mpu.getAccelerationY();
-		sensorZero[ACC_Z] += mpu.getAccelerationZ();
-		sensorZero[GYRO_Y] += mpu.getRotationX();
-	}*/
-	for (int i=0; i<3; i++) sensorZero[i] /= 50;
-	sensorZero[ACC_Z] -= 16384; 
 
-	printf("sensorZero[ACC_Z]=%d\nsensorZero[ACC_X]=%d\nsensorZero[GYRO_Y]=%d\n",sensorZero[ACC_Z],sensorZero[ACC_X],sensorZero[GYRO_Y]);
+
 	int AVERAGE_TIMES = 5; // number of values averaged together for imu
 
 	// balancing loop
@@ -221,7 +212,7 @@ int main(int argc, char** argv)
 	// check command line arguments
 	if (argc != 8) {
 		fprintf(stderr,"usage: sudo %s Kp Ki Kd Kp_dx Kd_dx PRINT DEBUG\n",argv[0]);
-		fprintf(stderr,"\tsudo %s 90 0 90 -.1 -3.5 1 0\n",argv[0]);
+		fprintf(stderr,"\tsudo %s 90 10 90 -.6 -.5\n",argv[0]);
 		return 1;
 	}
 	Kp = atof(argv[1]);
