@@ -1,19 +1,20 @@
-// Updated balance program to work with c++98
+// Balancing code that uses precise timing, averages imu readings, uses encoder values, removes calibration
 // This code doesn't zero out angle readings before running
 
-#include <stdlib.h>
+#include <stdlib.h> // basic libraries
 #include <stdio.h>
-#include <math.h>
 #include <unistd.h>
-#include <signal.h>
-#include <pthread.h>
-#include <time.h>
-#include "twbr.h"
-#include "PiMotor.h"
-#include "MPU6050.h"
-#include "I2Cdev.h"
-#include "timing.h"
-#include "encoder.h"
+
+#include <math.h> // for atan
+#include <pthread.h> // for multithreading
+#include "twbr.h" // for TWBR methods TODO: should be switched to wiringPi, not PIGPIO, to reduce dependencies
+#include "MPU6050.h" // for MPU6050 methods
+#include "I2Cdev.h"  // for MPU6050 methods
+#include "timing.h" // for delay()
+#include "encoder.h" // for encoder methods
+
+#include <signal.h> // TODO: not sure we need this
+#include <time.h> // TODO: not sure we need this
 
 using namespace std;
 
@@ -41,8 +42,8 @@ double iTerm = 0;
 double prevAngle = 0;
 double prevEnc = 0;
 
-// for timing
-int STD_LOOP_TIME = 10; // in milliseconds TODO: in forum, Kas made this 9 but that doesn't make sense? 
+// for precise timing
+int STD_LOOP_TIME = 10; // in milliseconds
 int lastLoopTime = STD_LOOP_TIME;
 int lastLoopUsefulTime = STD_LOOP_TIME;
 unsigned long loopStartTime;
@@ -77,10 +78,7 @@ void PID (double& motorPower, int& direction)
 	gyroAngle = gyroRate*sampleTime; // degrees
 	currentAngle = 0.99*(prevAngle + gyroAngle) + 0.01*(accAngle); // complementary filter
 
-	// get encoder
-	currentEnc = (enc1_val+enc2_val)/2;
-
-	// PID calculations
+	// angle PID calculations
 	pthread_mutex_lock (&lock);
 	err_angle = currentAngle - targetAngle; // targetAngle is 0
 	pthread_mutex_unlock (&lock);
@@ -90,20 +88,21 @@ void PID (double& motorPower, int& direction)
 	dTerm = Kd*(currentAngle - prevAngle);
 	prevAngle = currentAngle;
 
-	// TODO: write this code
+	// encoder PD calculations
+	currentEnc = (enc1_val+enc2_val)/2;
 	pTerm_dx = Kp_dx*currentEnc;
 	dTerm_dx = Kd_dx*(currentEnc-prevEnc);
 	prevEnc = currentEnc;
 
 	// sum up to motorPower
 	motorPower = pTerm + iTerm + dTerm + pTerm_dx + dTerm_dx;
+	motorPower *= -1; // TODO: make this more readable
 
-	// TODO: fix this
-	motorPower *= -1;
 
 	// keep within max power
 	if (motorPower > MAX_MOTOR) motorPower = MAX_MOTOR;
 	else if (motorPower < -MAX_MOTOR ) motorPower = -MAX_MOTOR;
+
 
 	// print statements
 	//if (PRINT) printf("currentAngle %3.2f\t enc1 = %ld\t enc2 = %ld\t enc_av = %ld\t motorPower = %3.2f\n",currentAngle,enc1_val,enc2_val,currentEnc,motorPower);
@@ -137,15 +136,13 @@ void* Balance (void* robot_)
 	mpu.initialize();
 
 	delay(100); // wait a moment
-
-
 	int AVERAGE_TIMES = 5; // number of values averaged together for imu
 
 	// balancing loop
 	loopStartTime = millis();
 	while(!break_condition) {
 
-		// read IMU values
+		// read and average IMU values
 		for (int i=0; i<3; i++) sensorValue[i] = 0;
 		for (int n=0; n<AVERAGE_TIMES; n++) {
 			sensorValue[ACC_X] += mpu.getAccelerationX();
@@ -154,7 +151,7 @@ void* Balance (void* robot_)
 		}
 		for (int i=0; i<3; i++) sensorValue[i] = sensorValue[i]/AVERAGE_TIMES - sensorZero[i];
 
-		accX = sensorValue[ACC_X]/16384.0;
+		accX = sensorValue[ACC_X]/16384.0; // TODO: probably don't need to divide by this
 		accZ = sensorValue[ACC_Z]/16384.0;
 		gyroY = -1*sensorValue[GYRO_Y]/131.0;
 
@@ -163,15 +160,13 @@ void* Balance (void* robot_)
 		enc1_val = enc1->value;
 		enc2_val = -1*enc2->value;
 
-		// calculate PID
+		// call PID functions and write to motors
 		PID(motorPower,direction);
-
-		// write to motors
 		pthread_mutex_lock (&lock);
 		robot->writePWMSame(direction,motorPower);
 		pthread_mutex_unlock (&lock);
 
-		// code to make sure loop executes with precise timing
+		// code to make sure loop executes with precise timing of every STD_LOOP_TIME milliseconds
 		//printf("lastLoopUsefulTime=%10d lastLoopTime=%10d\n",lastLoopUsefulTime,lastLoopTime);
 		lastLoopUsefulTime = millis()-loopStartTime;
 		if(lastLoopUsefulTime<STD_LOOP_TIME)			delay(STD_LOOP_TIME-lastLoopUsefulTime);
@@ -200,10 +195,10 @@ void* Stop (void* robot_)
 			pthread_mutex_unlock (&lock);
 		}
 		fflush(stdin);
-
 	}
 	return NULL;
 }
+
 
 
 // main function

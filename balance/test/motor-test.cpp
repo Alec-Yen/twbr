@@ -16,12 +16,13 @@ int main(int argc, char** argv) {
 
 	int s;
 	TWBR robot(p1,d1,p2,d2);
-	printf("Enter 'q' to quit.\nEnter PWM (0 to 255): ");
+	printf("Enter 'q' to quit.\nEnter PWM (-255 to 255): ");
 	while (1) {
 		if (cin >> s) {
-			robot.writePWMSame(0,s);
+			if (s < 0) robot.writePWMSame(-1,s*-1);
+			else robot.writePWMSame(0,s);
 			cin.clear();
-			printf("\nEnter PWM (0 to 255): ");
+			printf("\nEnter PWM (-255 to 255): ");
 		}
 	}
 

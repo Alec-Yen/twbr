@@ -1,5 +1,3 @@
-#include <iostream>
-#include <cstdio> // for printf
 #include <unistd.h> // for usleep
 #include <sys/time.h>
 #include <ctime>

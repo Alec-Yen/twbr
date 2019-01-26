@@ -1,7 +1,7 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <wiringPi.h>
 #include <pigpio.h>
-#include <unistd.h>
 
 #ifndef PIMOTOR_H
 #define PIMOTOR_H

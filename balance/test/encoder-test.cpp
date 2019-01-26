@@ -11,13 +11,21 @@ int d1 = 23; //Motor 0 DIR
 int p2 = 12;
 int d2 = 16;
 
+int e1a = 17;
+int e1b = 27;
+int e2a = 5;
+int e2b = 6;
+
 int main()
 {
-	TWBR robot(p1,d1,p2,d2);
-	robot.writePWMSame(0,10);
+	//TWBR robot(p1,d1,p2,d2);
+	//robot.writePWMSame(0,10);
 
-	struct encoder *enc1 = setupencoder(17,27);
-	struct encoder *enc2 = setupencoder(5,6);
+	struct encoder *enc1 = setupencoder(e1a,e1b);
+	struct encoder *enc2 = setupencoder(e2a,e2b);
+
+	printf("Turn the wheels to see how encoders respond\n");
+	usleep(1000000);
 	while(1) {
 		updateEncoders();
 		printf("enc1->value = %ld\tenc1->lastEncoded = %d\t", enc1->value,enc1->lastEncoded);
