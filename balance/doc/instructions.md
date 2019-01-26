@@ -28,20 +28,7 @@ sudo make install
 ```
 
 
-
-
-## OPTIONAL
-
-
-### libi2c-dev - not required, was used in attempt to communicate with MPU6050
-```
-sudo apt-get install libi2c-dev
-```
-### pigpio - mdd10a, hc-sr04
-
-
-
-### pigpio - analogous to wiringPi, required for one (currently unused) version of PiMotor
+### pigpio - analogous to wiringPi, required for one (currently used) version of PiMotor, am trying to replace with wiringPi
 ```
 cd
 rm pigpio.zip
@@ -52,4 +39,15 @@ cd PIGPIO
 make
 sudo make install
 ```
+
+
+
+## OPTIONAL
+
+
+### libi2c-dev - not required, was used in attempt to communicate with MPU6050
+```
+sudo apt-get install libi2c-dev
+```
+
 
