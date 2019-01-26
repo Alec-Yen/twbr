@@ -38,9 +38,9 @@ src/
 balance_final.cpp - best version, adds encoders, removes calibration  
   
 test/ *  
-balance_calibration.cpp - adds calibration, averaging imu input
-balance_timing.cpp - adds precise timing    
-01/09/19: balance_pthread.cpp - replaces with c++98 threading    
+01/18/19: balance_calibration.cpp - adds calibration, averaging imu input  
+01/11/19: balance_timing.cpp - adds precise timing    
+01/08/19: balance_pthread.cpp - replaces with c++98 threading    
 12/07/19: balance_thread11.cpp - adds c++11 threading, adds interrupts     
 12/04/19: balance_no_thread.cpp - first attempt at balancing  
 
