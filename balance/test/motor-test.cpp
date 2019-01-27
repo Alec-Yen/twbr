@@ -11,7 +11,7 @@ int d1 = 23; //Motor 0 DIR
 int p2 = 12;
 int d2 = 16;
 
-int main(int argc, char** argv) {
+int main() {
 	//Create a new instance for our Motor.
 
 	int s;
