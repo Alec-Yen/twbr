@@ -42,8 +42,8 @@ $(BIN)/balance_final: $(OBJ)/balance_final.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
 $(BIN)/balance_calibration: $(OBJ)/balance_calibration.o $(OBJECTS)
-	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS
-	)
+	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
+
 $(BIN)/roam: $(OBJ)/roam.o $(OBJECTS)
 	$(CXX) $(LFLAGS) $^ -o $@ $(LIBS)
 
