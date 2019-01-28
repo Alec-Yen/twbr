@@ -33,7 +33,7 @@ void TWBR::writePWMSame (int FB,int speed)
 	else { ld = 1; rd = 0; }
 
 	lMotor.run(ld, speed);
-	rMotor.run(rd, speed);
+	rMotor.run(rd, speed+7);
 }
 
 
